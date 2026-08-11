@@ -15,8 +15,11 @@ import { TrackGrievance } from './pages/TrackGrievance';
 import { CitizenDashboard } from './pages/CitizenDashboard';
 import { OfficerDashboard } from './pages/OfficerDashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { AdminManageOfficers } from './pages/AdminManageOfficers';
+import { AdminManageGrievances } from './pages/AdminManageGrievances';
+import { AdminSystemSettings } from './pages/AdminSystemSettings';
 
-import { Key, Landmark, ShieldCheck, UserCheck } from 'lucide-react';
+import { Key, Landmark, Lock, ShieldCheck, UserCheck } from 'lucide-react';
 
 const App: React.FC = () => {
   // Auth state (Default logged in for immediate demo bypass, login option available)
@@ -38,11 +41,14 @@ const App: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [userName, setUserName] = useState('Rahul Verma');
 
-  const [loginTab, setLoginTab] = useState<'phone' | 'email'>('phone');
+  const [loginTab, setLoginTab] = useState<'phone' | 'email' | 'admin'>('phone');
   const [phone, setPhone] = useState('9876543210');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
+  const [adminAccessCode, setAdminAccessCode] = useState('ADMIN-2026');
+  const [adminEmail, setAdminEmail] = useState('demo.admin@jansetu.ai');
+  const [adminPassword, setAdminPassword] = useState('Demo@123');
 
   const playVoiceGuide = () => {
     if ('speechSynthesis' in window) {
@@ -217,6 +223,22 @@ const App: React.FC = () => {
   const handleLogout = () => {
     setIsLoggedIn(false);
     setAuthError('');
+    setLoginTab('phone');
+  };
+
+  const handleAdminLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      const response = await api.adminLogin(adminEmail, adminPassword, adminAccessCode);
+      setIsLoggedIn(true);
+      handleRoleChange(response.user.role as UserRole);
+    } catch (e: any) {
+      setAuthError(e.message || 'Admin authentication failed.');
+    } finally {
+      setAuthLoading(false);
+    }
   };
 
   // 1. SIGN IN SCREEN VIEW
@@ -244,22 +266,33 @@ const App: React.FC = () => {
             {/* Left Column: Interactive Form */}
             <div className="p-6 md:p-10 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-800">
               
-              {/* Language switcher dropdown inside login form */}
-              <div className="flex justify-end gap-1.5 mb-6 text-[11px] font-bold text-slate-500 items-center">
-                <span>🌐 Language / भाषा:</span>
-                <select
-                  value={lang}
-                  onChange={(e) => setLang(e.target.value as Language)}
-                  className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-white focus:border-orange-500 focus:outline-none cursor-pointer font-sans"
+              {/* Tab Selector — 3 tabs */}
+              <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800/80 mb-6">
+                <button
+                  type="button"
+                  onClick={() => { setLoginTab('phone'); setAuthError(''); }}
+                  className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all ${loginTab === 'phone' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white'}`}
                 >
-                  <option value="en">English (EN)</option>
-                  <option value="hi">हिन्दी (Hindi)</option>
-                  <option value="gu">ગુજરાતી (Gujarati)</option>
-                </select>
+                  📱 Mobile & OTP
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setLoginTab('email'); setAuthError(''); }}
+                  className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all ${loginTab === 'email' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                >
+                  ✉️ Email & Password
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setLoginTab('admin'); setAuthError(''); }}
+                  className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all ${loginTab === 'admin' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                >
+                  🔐 Admin Portal
+                </button>
               </div>
 
-              {/* Mobile + OTP Flow */}
-              <div className="space-y-4">
+              {loginTab === 'phone' ? (
+                <div className="space-y-4">
                 <h4 className="font-extrabold text-sm text-slate-200">{translate('login_title', lang)}</h4>
                 
                 {!otpSent ? (
@@ -333,7 +366,120 @@ const App: React.FC = () => {
                     </div>
                   </form>
                 )}
-              </div>
+                </div>
+              ) : loginTab === 'email' ? (
+                /* Email + Password Flow */
+                <form onSubmit={handleLoginSubmit} className="space-y-4">
+                  <h4 className="font-extrabold text-sm text-slate-200">Officer / Admin Sign In</h4>
+                  <p className="text-[11px] text-slate-400 leading-relaxed font-medium">Authentication portal for municipal officers and command center managers.</p>
+                  
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="e.g. demo.officer@jansetu.ai"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:border-indigo-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:border-indigo-500 focus:outline-none"
+                    />
+                  </div>
+
+                  {authError && <p className="text-rose-500 text-xs font-semibold">⚠️ {authError}</p>}
+
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all disabled:opacity-60"
+                  >
+                    {authLoading ? 'Signing in...' : 'Sign In'}
+                  </button>
+                </form>
+              ) : (
+                /* Admin Portal Login */
+                <form onSubmit={handleAdminLoginSubmit} className="space-y-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="p-1.5 bg-emerald-500/10 rounded-lg border border-emerald-500/30">
+                      <Lock size={14} className="text-emerald-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-sm text-slate-200">Admin Command Portal</h4>
+                      <p className="text-[9px] text-emerald-400 font-bold uppercase tracking-wider">Authorized Personnel Only</p>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-relaxed font-medium">Secure access for district administrators and system managers. Requires admin access code.</p>
+                  
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Admin Email
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={adminEmail}
+                      onChange={(e) => setAdminEmail(e.target.value)}
+                      placeholder="demo.admin@jansetu.ai"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:border-emerald-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={adminPassword}
+                      onChange={(e) => setAdminPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:border-emerald-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      🔑 Admin Access Code
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={adminAccessCode}
+                      onChange={(e) => setAdminAccessCode(e.target.value.toUpperCase())}
+                      placeholder="ADMIN-XXXX"
+                      className="w-full bg-slate-950 border border-emerald-800/50 rounded-xl px-4 py-3 text-xs text-emerald-300 font-mono tracking-wider focus:border-emerald-500 focus:outline-none"
+                    />
+                    <p className="text-[9px] text-slate-500 mt-1">Demo code: <span className="text-emerald-400 font-bold">ADMIN-2026</span></p>
+                  </div>
+
+                  {authError && <p className="text-rose-500 text-xs font-semibold">⚠️ {authError}</p>}
+
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all disabled:opacity-60 flex justify-center items-center gap-1.5"
+                  >
+                    <Lock size={12} />
+                    {authLoading ? 'Authenticating...' : 'Secure Admin Sign In'}
+                  </button>
+                </form>
+              )}
             </div>
 
             {/* Right Column: Step-by-Step Instructions & Helpers */}
@@ -443,6 +589,7 @@ const App: React.FC = () => {
         onFontSizeChange={setFontSize}
         highContrast={highContrast}
         onHighContrastChange={setHighContrast}
+        onLogout={handleLogout}
       />
 
       {/* Primary Page views router */}
@@ -490,6 +637,15 @@ const App: React.FC = () => {
           <>
             {currentTab === 'dashboard' && (
               <AdminDashboard lang={lang} />
+            )}
+            {currentTab === 'manage-grievances' && (
+              <AdminManageGrievances lang={lang} />
+            )}
+            {currentTab === 'manage-officers' && (
+              <AdminManageOfficers lang={lang} />
+            )}
+            {currentTab === 'system-settings' && (
+              <AdminSystemSettings lang={lang} onDataReset={fetchNotifications} />
             )}
             {currentTab === 'ai-architecture' && (
               <AIArchitecture />
