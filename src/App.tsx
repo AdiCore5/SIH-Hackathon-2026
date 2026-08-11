@@ -20,7 +20,7 @@ import { Key, Landmark, ShieldCheck, UserCheck } from 'lucide-react';
 
 const App: React.FC = () => {
   // Auth state (Default logged in for immediate demo bypass, login option available)
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState('demo.citizen@jansetu.ai');
   const [password, setPassword] = useState('Demo@123');
   const [authError, setAuthError] = useState('');
