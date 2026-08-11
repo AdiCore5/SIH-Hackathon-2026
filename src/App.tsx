@@ -244,30 +244,18 @@ const App: React.FC = () => {
             {/* Left Column: Interactive Form */}
             <div className="p-6 md:p-10 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-800">
               
-              {/* Language switcher inside login form */}
-              <div className="flex justify-end gap-1.5 mb-6 text-[10px] font-bold text-slate-500 items-center">
+              {/* Language switcher dropdown inside login form */}
+              <div className="flex justify-end gap-1.5 mb-6 text-[11px] font-bold text-slate-500 items-center">
                 <span>🌐 Language / भाषा:</span>
-                <button 
-                  type="button" 
-                  onClick={() => setLang('en')} 
-                  className={`px-2 py-0.5 rounded border border-slate-800 transition-all ${lang === 'en' ? 'bg-orange-500 text-white border-orange-500' : 'text-slate-400 hover:text-white'}`}
+                <select
+                  value={lang}
+                  onChange={(e) => setLang(e.target.value as Language)}
+                  className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-white focus:border-orange-500 focus:outline-none cursor-pointer font-sans"
                 >
-                  EN
-                </button>
-                <button 
-                  type="button" 
-                  onClick={() => setLang('hi')} 
-                  className={`px-2 py-0.5 rounded border border-slate-800 transition-all ${lang === 'hi' ? 'bg-orange-500 text-white border-orange-500' : 'text-slate-400 hover:text-white'}`}
-                >
-                  हिन्दी
-                </button>
-                <button 
-                  type="button" 
-                  onClick={() => setLang('gu')} 
-                  className={`px-2 py-0.5 rounded border border-slate-800 transition-all ${lang === 'gu' ? 'bg-orange-500 text-white border-orange-500' : 'text-slate-400 hover:text-white'}`}
-                >
-                  ગુજરાતી
-                </button>
+                  <option value="en">English (EN)</option>
+                  <option value="hi">हिन्दी (Hindi)</option>
+                  <option value="gu">ગુજરાતી (Gujarati)</option>
+                </select>
               </div>
 
               {/* Mobile + OTP Flow */}
