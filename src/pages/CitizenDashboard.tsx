@@ -4,7 +4,7 @@ import { api } from '../services/api';
 import { Grievance } from '../types';
 import { 
   FileText, Clock, CheckCircle2, AlertTriangle, 
-  Search, Filter, ArrowRight, ShieldCheck, User, Star, MapPin, Building2, ChevronRight
+  Search, Filter, ArrowRight, ShieldCheck, User, MapPin, Building2, ChevronRight
 } from 'lucide-react';
 
 interface CitizenDashboardProps {
@@ -62,60 +62,60 @@ export const CitizenDashboard: React.FC<CitizenDashboardProps> = ({ lang, onNavi
   });
 
   const getStatusBadge = (status: string) => {
-    let color = "text-slate-700 bg-slate-100 border-slate-300";
-    if (status === 'Submitted') color = "text-sky-700 bg-sky-50 border-sky-200";
-    if (status === 'AI Classified') color = "text-purple-700 bg-purple-50 border-purple-200 animate-pulse";
-    if (status === 'Assigned') color = "text-blue-700 bg-blue-50 border-blue-200 font-bold";
-    if (status === 'In Progress') color = "text-orange-700 bg-orange-50 border-orange-200 font-bold";
-    if (status === 'Awaiting Citizen') color = "text-amber-700 bg-amber-50 border-amber-200";
-    if (status === 'Resolved') color = "text-emerald-700 bg-emerald-50 border-emerald-200 font-bold";
-    if (status === 'Closed') color = "text-slate-700 bg-slate-100 border-slate-300";
-    if (status === 'Escalated') color = "text-rose-700 bg-rose-50 border-rose-200 font-black shadow-xs";
+    let color = "text-slate-900 bg-slate-200 border-slate-400";
+    if (status === 'Submitted') color = "text-sky-950 bg-sky-100 border-sky-400 font-extrabold";
+    if (status === 'AI Classified') color = "text-purple-950 bg-purple-100 border-purple-400 font-extrabold animate-pulse";
+    if (status === 'Assigned') color = "text-blue-950 bg-blue-100 border-blue-400 font-extrabold";
+    if (status === 'In Progress') color = "text-orange-950 bg-orange-100 border-orange-400 font-extrabold";
+    if (status === 'Awaiting Citizen') color = "text-amber-950 bg-amber-100 border-amber-400 font-extrabold";
+    if (status === 'Resolved') color = "text-emerald-950 bg-emerald-100 border-emerald-400 font-extrabold";
+    if (status === 'Closed') color = "text-slate-900 bg-slate-200 border-slate-400 font-extrabold";
+    if (status === 'Escalated') color = "text-rose-950 bg-rose-100 border-rose-400 font-black shadow-sm";
     
     return (
-      <span className={`px-3 py-1 rounded-full text-[11px] font-extrabold tracking-wide border ${color}`}>
+      <span className={`px-3 py-1 rounded-full text-[11px] font-extrabold tracking-wide border-2 ${color}`}>
         {status}
       </span>
     );
   };
 
   const getPriorityBadge = (priority: string) => {
-    if (priority === 'Critical') return 'bg-rose-100 text-rose-800 border-rose-300 font-black';
-    if (priority === 'High') return 'bg-orange-100 text-orange-800 border-orange-300 font-bold';
-    if (priority === 'Medium') return 'bg-amber-100 text-amber-800 border-amber-300';
-    return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+    if (priority === 'Critical') return 'bg-rose-200 text-rose-950 border-rose-400 font-black';
+    if (priority === 'High') return 'bg-orange-200 text-orange-950 border-orange-400 font-black';
+    if (priority === 'Medium') return 'bg-amber-200 text-amber-950 border-amber-400 font-extrabold';
+    return 'bg-emerald-200 text-emerald-950 border-emerald-400 font-extrabold';
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 flex flex-col gap-8 animate-slide-up">
+    <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 flex flex-col gap-8 animate-slide-up bg-slate-100/70 min-h-screen">
       
       {/* Official Citizen Welcome Banner */}
-      <section className="bg-slate-900 text-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-800 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <section className="bg-slate-900 text-white rounded-3xl p-6 md:p-8 shadow-2xl border-2 border-slate-700 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/20 rounded-full blur-3xl pointer-events-none"></div>
         
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 bg-orange-600/20 border-2 border-orange-500 rounded-2xl flex items-center justify-center text-orange-400 font-black text-2xl shadow-lg shrink-0">
+            <div className="h-16 w-16 bg-orange-500 text-slate-950 border-2 border-orange-400 rounded-2xl flex items-center justify-center font-black text-2xl shadow-lg shrink-0">
               <User size={32} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Rahul Verma</h2>
-                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                  <ShieldCheck size={12} /> Verified Aadhaar
+                <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white">Rahul Verma</h2>
+                <span className="bg-emerald-500/30 text-emerald-300 border-2 border-emerald-400 text-[10px] font-extrabold px-3 py-1 rounded-full flex items-center gap-1">
+                  <ShieldCheck size={14} /> Verified Citizen Aadhaar
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-1 flex items-center gap-2">
+              <p className="text-xs text-slate-300 mt-1 font-semibold flex items-center gap-2">
                 <span>Aadhaar Virtual ID: •••• •••• 9812</span>
-                <span className="text-slate-600">•</span>
-                <span>District: Vadodara Urban</span>
+                <span className="text-slate-500">•</span>
+                <span className="text-orange-400 font-bold">District: Vadodara Urban (Ward 12)</span>
               </p>
             </div>
           </div>
 
           <button
             onClick={() => onNavigate('lodge')}
-            className="bg-orange-600 hover:bg-orange-500 text-white text-xs font-extrabold px-6 py-3.5 rounded-2xl shadow-xl hover-lift flex items-center gap-2 border border-orange-400/30 shrink-0"
+            className="bg-orange-600 hover:bg-orange-500 text-white text-xs font-black px-6 py-3.5 rounded-2xl shadow-2xl hover-lift flex items-center gap-2 border-2 border-orange-400 shrink-0"
           >
             <span>📝 Lodge New Grievance</span>
             <ArrowRight size={16} />
@@ -123,73 +123,73 @@ export const CitizenDashboard: React.FC<CitizenDashboardProps> = ({ lang, onNavi
         </div>
       </section>
 
-      {/* Metric Counters Cards */}
+      {/* Metric Counters Cards with High Contrast Accent Borders */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="gov-card p-5 border-l-4 border-l-slate-700">
+        <div className="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-md border-t-8 border-t-slate-800">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] uppercase font-bold text-slate-400">Total Registered</span>
-            <FileText size={18} className="text-slate-400" />
+            <span className="text-xs uppercase font-extrabold text-slate-700">Total Registered</span>
+            <FileText size={20} className="text-slate-700" />
           </div>
-          <p className="text-3xl font-black text-slate-900 leading-none">{total}</p>
-          <span className="text-[10px] text-slate-400 mt-2 block">CPGRAMS Synced</span>
+          <p className="text-4xl font-black text-slate-950 mt-1 leading-none">{total}</p>
+          <span className="text-[11px] text-slate-600 font-bold mt-2.5 block">CPGRAMS Central Synced</span>
         </div>
 
-        <div className="gov-card p-5 border-l-4 border-l-orange-500">
+        <div className="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-md border-t-8 border-t-orange-500">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] uppercase font-bold text-orange-600">In Active Redressal</span>
-            <Clock size={18} className="text-orange-500 animate-pulse" />
+            <span className="text-xs uppercase font-extrabold text-orange-700">In Active Redressal</span>
+            <Clock size={20} className="text-orange-600 animate-pulse" />
           </div>
-          <p className="text-3xl font-black text-slate-900 leading-none">{inProgress}</p>
-          <span className="text-[10px] text-orange-600 font-semibold mt-2 block">Assigned to Ward Nodal Officer</span>
+          <p className="text-4xl font-black text-slate-950 mt-1 leading-none">{inProgress}</p>
+          <span className="text-[11px] text-orange-700 font-extrabold mt-2.5 block">Field Nodal Officer Active</span>
         </div>
 
-        <div className="gov-card p-5 border-l-4 border-l-emerald-500">
+        <div className="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-md border-t-8 border-t-emerald-600">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] uppercase font-bold text-emerald-600">Resolved & Verified</span>
-            <CheckCircle2 size={18} className="text-emerald-500" />
+            <span className="text-xs uppercase font-extrabold text-emerald-800">Resolved & Verified</span>
+            <CheckCircle2 size={20} className="text-emerald-600" />
           </div>
-          <p className="text-3xl font-black text-slate-900 leading-none">{resolved}</p>
-          <span className="text-[10px] text-emerald-600 font-semibold mt-2 block">Photo Proof Uploaded</span>
+          <p className="text-4xl font-black text-slate-950 mt-1 leading-none">{resolved}</p>
+          <span className="text-[11px] text-emerald-800 font-extrabold mt-2.5 block">Photo Proof Uploaded</span>
         </div>
 
-        <div className="gov-card p-5 border-l-4 border-l-rose-500">
+        <div className="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-md border-t-8 border-t-rose-600">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] uppercase font-bold text-rose-600">SLA Escalated</span>
-            <AlertTriangle size={18} className="text-rose-500" />
+            <span className="text-xs uppercase font-extrabold text-rose-800">SLA Escalated</span>
+            <AlertTriangle size={20} className="text-rose-600" />
           </div>
-          <p className="text-3xl font-black text-slate-900 leading-none">{escalated}</p>
-          <span className="text-[10px] text-rose-600 font-semibold mt-2 block">High-Level Nodal Attention</span>
+          <p className="text-4xl font-black text-slate-950 mt-1 leading-none">{escalated}</p>
+          <span className="text-[11px] text-rose-800 font-extrabold mt-2.5 block">Division Chief Attention</span>
         </div>
       </section>
 
       {/* Main Complaints Section */}
-      <section className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md flex flex-col gap-6">
+      <section className="bg-white border-2 border-slate-300 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col gap-6">
         
         {/* Controls Toolbar */}
-        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b border-slate-100 pb-5">
+        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b-2 border-slate-200 pb-5">
           <div>
-            <h3 className="font-extrabold text-slate-900 text-lg">My Grievances & Redressal Records</h3>
-            <p className="text-xs text-slate-500">Track real-time status updates and department field inspection records.</p>
+            <h3 className="font-black text-slate-950 text-xl">My Grievances & Redressal Records</h3>
+            <p className="text-xs text-slate-700 font-semibold">Track real-time status updates and department field inspection records.</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             {/* Filter Tabs */}
-            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
+            <div className="flex bg-slate-200 p-1 rounded-2xl border-2 border-slate-300 text-xs">
               <button 
                 onClick={() => setFilterStatus('all')}
-                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${filterStatus === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3.5 py-1.5 rounded-xl font-extrabold transition-all ${filterStatus === 'all' ? 'bg-slate-950 text-white shadow-md' : 'text-slate-800 hover:text-slate-950'}`}
               >
                 All ({total})
               </button>
               <button 
                 onClick={() => setFilterStatus('progress')}
-                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${filterStatus === 'progress' ? 'bg-orange-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3.5 py-1.5 rounded-xl font-extrabold transition-all ${filterStatus === 'progress' ? 'bg-orange-600 text-white shadow-md' : 'text-slate-800 hover:text-slate-950'}`}
               >
                 In Progress ({inProgress})
               </button>
               <button 
                 onClick={() => setFilterStatus('resolved')}
-                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${filterStatus === 'resolved' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`px-3.5 py-1.5 rounded-xl font-extrabold transition-all ${filterStatus === 'resolved' ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-800 hover:text-slate-950'}`}
               >
                 Resolved ({resolved})
               </button>
@@ -202,22 +202,22 @@ export const CitizenDashboard: React.FC<CitizenDashboardProps> = ({ lang, onNavi
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search complaint ID..."
-                className="rounded-xl border border-slate-200 pl-8 pr-3 py-1.5 text-xs text-slate-700 focus:border-orange-500 focus:outline-none w-48 shadow-xs"
+                className="rounded-2xl border-2 border-slate-300 pl-9 pr-3 py-2 text-xs font-bold text-slate-950 focus:border-orange-500 focus:outline-none w-52 shadow-xs bg-slate-50"
               />
-              <Search className="absolute left-2.5 top-2 text-slate-400" size={14} />
+              <Search className="absolute left-3 top-2.5 text-slate-500" size={15} />
             </div>
 
             {/* View Mode Toggle */}
-            <div className="hidden sm:flex border border-slate-200 rounded-xl p-0.5 bg-slate-50">
+            <div className="hidden sm:flex border-2 border-slate-300 rounded-2xl p-1 bg-slate-200">
               <button 
                 onClick={() => setViewMode('cards')} 
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold ${viewMode === 'cards' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'}`}
+                className={`px-3 py-1 rounded-xl text-xs font-black ${viewMode === 'cards' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-700'}`}
               >
                 Cards
               </button>
               <button 
                 onClick={() => setViewMode('table')} 
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold ${viewMode === 'table' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'}`}
+                className={`px-3 py-1 rounded-xl text-xs font-black ${viewMode === 'table' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-700'}`}
               >
                 Table
               </button>
@@ -227,102 +227,102 @@ export const CitizenDashboard: React.FC<CitizenDashboardProps> = ({ lang, onNavi
 
         {/* Complaints Listing */}
         {loading ? (
-          <div className="p-12 text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-3">
-            <div className="h-8 w-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-            <span>Fetching live grievance records from NIC server...</span>
+          <div className="p-12 text-center text-xs text-slate-500 flex flex-col items-center justify-center gap-3">
+            <div className="h-9 w-9 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+            <span className="font-extrabold text-slate-800">Fetching live grievance records from NIC server...</span>
           </div>
         ) : filteredGrievances.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
-            <FileText size={36} className="text-slate-300" />
-            <p className="text-sm font-bold text-slate-600">No grievances match the selected criteria.</p>
-            <p className="text-xs text-slate-400">Click "Lodge New Grievance" above to file a new public issue.</p>
+          <div className="p-12 text-center text-slate-500 flex flex-col items-center justify-center gap-2">
+            <FileText size={40} className="text-slate-400" />
+            <p className="text-base font-black text-slate-900">No grievances match the selected criteria.</p>
+            <p className="text-xs text-slate-600 font-semibold">Click "Lodge New Grievance" above to file a new public issue.</p>
           </div>
         ) : viewMode === 'cards' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredGrievances.map(g => (
               <div 
                 key={g.id}
-                className="border border-slate-200 rounded-2xl p-5 hover:shadow-lg transition-all bg-white flex flex-col justify-between gap-4 hover:border-orange-300"
+                className="border-2 border-slate-300 rounded-3xl p-6 hover:shadow-2xl transition-all bg-white flex flex-col justify-between gap-5 hover:border-orange-500"
               >
                 <div>
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="font-mono text-xs font-black bg-slate-100 text-slate-900 px-2.5 py-1 rounded-md border border-slate-200">
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className="font-mono text-xs font-black bg-slate-900 text-white px-3 py-1 rounded-lg shadow-xs">
                       {g.id}
                     </span>
                     {getStatusBadge(g.status)}
                   </div>
 
-                  <h4 className="font-extrabold text-slate-900 text-base leading-snug mb-1">
+                  <h4 className="font-black text-slate-950 text-lg leading-snug mb-2">
                     {g.title}
                   </h4>
-                  <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-3">
+                  <p className="text-xs text-slate-800 font-medium line-clamp-2 leading-relaxed mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-200">
                     {g.description}
                   </p>
 
-                  <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500 font-medium">
-                    <span className="flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
-                      <Building2 size={12} className="text-orange-500" />
+                  <div className="flex flex-wrap items-center gap-2 text-xs font-extrabold">
+                    <span className="flex items-center gap-1.5 bg-slate-100 text-slate-900 px-2.5 py-1 rounded-xl border border-slate-300">
+                      <Building2 size={14} className="text-orange-600" />
                       {g.category}
                     </span>
-                    <span className="flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
-                      <MapPin size={12} className="text-slate-400" />
+                    <span className="flex items-center gap-1.5 bg-slate-100 text-slate-900 px-2.5 py-1 rounded-xl border border-slate-300">
+                      <MapPin size={14} className="text-slate-600" />
                       {g.location.ward || g.location.city}
                     </span>
-                    <span className={`px-2 py-0.5 rounded border text-[10px] font-bold ${getPriorityBadge(g.priority)}`}>
+                    <span className={`px-2.5 py-1 rounded-xl border-2 text-[11px] font-black ${getPriorityBadge(g.priority)}`}>
                       Priority: {g.priority}
                     </span>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                  <span className="text-slate-400 text-[11px]">
+                <div className="pt-4 border-t-2 border-slate-100 flex items-center justify-between text-xs">
+                  <span className="text-slate-600 font-bold text-[11px]">
                     Filed on {new Date(g.createdAt).toLocaleDateString()}
                   </span>
                   <button
                     onClick={() => onNavigate('track', g.id)}
-                    className="bg-orange-50 hover:bg-orange-100 text-orange-600 px-3.5 py-1.5 rounded-xl font-extrabold flex items-center gap-1.5 transition-colors border border-orange-200"
+                    className="bg-orange-600 hover:bg-orange-500 text-white px-4 py-2 rounded-xl font-black flex items-center gap-1.5 transition-colors border-2 border-orange-400 shadow-md"
                   >
                     <span>Track Live Status</span>
-                    <ChevronRight size={14} />
+                    <ChevronRight size={16} />
                   </button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-2xl border-2 border-slate-300 shadow-md">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 text-[10px] uppercase font-bold text-slate-400 bg-slate-50/80">
-                  <th className="py-3 px-4">Grievance Token</th>
-                  <th className="py-3 px-4">Subject Title</th>
-                  <th className="py-3 px-4">Department</th>
-                  <th className="py-3 px-4">Filing Date</th>
-                  <th className="py-3 px-4">Priority</th>
-                  <th className="py-3 px-4">Current Status</th>
-                  <th className="py-3 px-4 text-right">Action</th>
+                <tr className="border-b-2 border-slate-950 text-xs font-black text-white bg-slate-900">
+                  <th className="py-4 px-4">Grievance Token</th>
+                  <th className="py-4 px-4">Subject Title</th>
+                  <th className="py-4 px-4">Department</th>
+                  <th className="py-4 px-4">Filing Date</th>
+                  <th className="py-4 px-4">Priority</th>
+                  <th className="py-4 px-4">Current Status</th>
+                  <th className="py-4 px-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y-2 divide-slate-200">
                 {filteredGrievances.map(g => (
-                  <tr key={g.id} className="border-b border-slate-100 hover:bg-slate-50 transition-all">
-                    <td className="py-3.5 px-4 font-mono font-extrabold text-slate-900">{g.id}</td>
-                    <td className="py-3.5 px-4 font-bold text-slate-800 max-w-[220px] truncate">{g.title}</td>
-                    <td className="py-3.5 px-4 text-slate-600">{g.category}</td>
-                    <td className="py-3.5 px-4 text-slate-400">{new Date(g.createdAt).toLocaleDateString()}</td>
-                    <td className="py-3.5 px-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getPriorityBadge(g.priority)}`}>
+                  <tr key={g.id} className="hover:bg-orange-50/50 transition-all odd:bg-white even:bg-slate-50 font-bold text-slate-950">
+                    <td className="py-4 px-4 font-mono font-black text-slate-950 text-sm">{g.id}</td>
+                    <td className="py-4 px-4 font-black text-slate-950 max-w-[220px] truncate">{g.title}</td>
+                    <td className="py-4 px-4 text-slate-900 font-bold">{g.category}</td>
+                    <td className="py-4 px-4 text-slate-700">{new Date(g.createdAt).toLocaleDateString()}</td>
+                    <td className="py-4 px-4">
+                      <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black border-2 ${getPriorityBadge(g.priority)}`}>
                         {g.priority}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4">{getStatusBadge(g.status)}</td>
-                    <td className="py-3.5 px-4 text-right">
+                    <td className="py-4 px-4">{getStatusBadge(g.status)}</td>
+                    <td className="py-4 px-4 text-right">
                       <button
                         onClick={() => onNavigate('track', g.id)}
-                        className="text-xs text-orange-600 hover:text-orange-700 font-extrabold inline-flex items-center gap-1 bg-orange-50 px-3 py-1 rounded-lg border border-orange-200"
+                        className="text-xs text-white bg-orange-600 hover:bg-orange-500 font-black inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border-2 border-orange-400 shadow-sm"
                       >
                         <span>Track</span>
-                        <ArrowRight size={12} />
+                        <ArrowRight size={14} />
                       </button>
                     </td>
                   </tr>

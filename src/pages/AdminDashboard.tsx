@@ -47,9 +47,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang }) => {
 
   if (loading || !analytics) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-3">
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center text-xs text-slate-500 flex flex-col items-center justify-center gap-3">
         <div className="h-10 w-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-        <span>Initializing National Executive Control Analytics...</span>
+        <span className="font-extrabold text-slate-800">Initializing National Executive Control Analytics...</span>
       </div>
     );
   }
@@ -57,35 +57,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang }) => {
   const { metrics, department_performance, category_distribution, monthly_trend } = analytics;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 flex flex-col gap-8 animate-slide-up">
+    <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 flex flex-col gap-8 animate-slide-up bg-slate-100/70 min-h-screen">
       
       {/* Executive Command Center Header */}
-      <section className="bg-slate-900 text-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <section className="bg-slate-900 text-white rounded-3xl p-6 md:p-8 shadow-2xl border-2 border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold text-orange-400 uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-2 text-xs font-black text-orange-400 uppercase tracking-wider mb-1">
             <Landmark size={16} />
             <span>National Governance & Public Redressal Monitoring</span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white flex items-center gap-2">
             Executive Command Center
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-300 font-semibold mt-1">
             Real-time telemetry across 18 State Municipalities, CPGRAMS APIs & AI Routing Nodes.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="bg-slate-800 border border-slate-700 p-3 rounded-2xl flex items-center gap-3 text-xs">
-            <Cpu size={20} className="text-orange-400 animate-pulse" />
+          <div className="bg-slate-800 border-2 border-slate-700 p-3.5 rounded-2xl flex items-center gap-3 text-xs shadow-md">
+            <Cpu size={22} className="text-orange-400 animate-pulse" />
             <div>
-              <span className="text-[10px] text-slate-400 font-bold uppercase block">AI Classifier Accuracy</span>
-              <span className="font-extrabold text-emerald-400 text-sm">98.4% Confidence</span>
+              <span className="text-[10px] text-slate-400 font-extrabold uppercase block">AI Classifier Accuracy</span>
+              <span className="font-black text-emerald-400 text-sm">98.4% Confidence</span>
             </div>
           </div>
           
           <button 
             onClick={fetchAnalytics}
-            className="p-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-2xl transition-all"
+            className="p-3.5 bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 text-slate-200 rounded-2xl transition-all shadow-md"
             title="Refresh Analytics Telemetry"
           >
             <RefreshCw size={18} className="text-sky-400" />
@@ -93,45 +93,45 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang }) => {
         </div>
       </section>
 
-      {/* Stats KPI Cards */}
+      {/* Stats KPI Cards with High-Contrast Color Top Borders */}
       <section className="grid grid-cols-2 lg:grid-cols-6 gap-4">
-        <div className="gov-card p-5 border-l-4 border-l-slate-700">
-          <span className="text-[10px] uppercase font-bold text-slate-400">Total Grievances</span>
-          <p className="text-3xl font-black text-slate-900 mt-1 leading-none">{metrics.total}</p>
-          <span className="text-[10px] text-emerald-600 font-bold mt-1 block">Live Intake</span>
+        <div className="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-md border-t-8 border-t-slate-800">
+          <span className="text-xs uppercase font-extrabold text-slate-700">Total Grievances</span>
+          <p className="text-4xl font-black text-slate-950 mt-1.5 leading-none">{metrics.total}</p>
+          <span className="text-[11px] text-emerald-700 font-extrabold mt-2 block">Live Telemetry</span>
         </div>
 
-        <div className="gov-card p-5 border-l-4 border-l-emerald-500">
-          <span className="text-[10px] uppercase font-bold text-emerald-600">Resolved Cases</span>
-          <p className="text-3xl font-black text-slate-900 mt-1 leading-none">{metrics.resolved}</p>
-          <span className="text-[10px] text-emerald-600 font-bold mt-1 block">Verified Proof</span>
+        <div className="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-md border-t-8 border-t-emerald-600">
+          <span className="text-xs uppercase font-extrabold text-emerald-800">Resolved Cases</span>
+          <p className="text-4xl font-black text-slate-950 mt-1.5 leading-none">{metrics.resolved}</p>
+          <span className="text-[11px] text-emerald-800 font-extrabold mt-2 block">Verified Proof</span>
         </div>
 
-        <div className="gov-card p-5 border-l-4 border-l-amber-500">
-          <span className="text-[10px] uppercase font-bold text-amber-600">In Redressal Queue</span>
-          <p className="text-3xl font-black text-slate-900 mt-1 leading-none">{metrics.pending}</p>
-          <span className="text-[10px] text-amber-600 font-bold mt-1 block">Field Active</span>
+        <div className="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-md border-t-8 border-t-amber-500">
+          <span className="text-xs uppercase font-extrabold text-amber-800">In Redressal Queue</span>
+          <p className="text-4xl font-black text-slate-950 mt-1.5 leading-none">{metrics.pending}</p>
+          <span className="text-[11px] text-amber-800 font-extrabold mt-2 block">Field Active</span>
         </div>
 
-        <div className="gov-card p-5 border-l-4 border-l-rose-500">
-          <span className="text-[10px] uppercase font-bold text-rose-600">High Risk SLA</span>
-          <p className="text-3xl font-black text-rose-600 mt-1 leading-none">{metrics.escalated}</p>
-          <span className="text-[10px] text-rose-600 font-bold mt-1 block">Auto Escalated</span>
+        <div className="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-md border-t-8 border-t-rose-600">
+          <span className="text-xs uppercase font-extrabold text-rose-800">High Risk SLA</span>
+          <p className="text-4xl font-black text-rose-700 mt-1.5 leading-none">{metrics.escalated}</p>
+          <span className="text-[11px] text-rose-800 font-extrabold mt-2 block">Auto Escalated</span>
         </div>
 
-        <div className="gov-card p-5 border-l-4 border-l-blue-600">
-          <span className="text-[10px] uppercase font-bold text-blue-600">Avg SLA Speed</span>
-          <p className="text-3xl font-black text-slate-900 mt-1 leading-none">{metrics.avg_resolution_time}h</p>
-          <span className="text-[10px] text-blue-600 font-bold mt-1 block">⚡ 72% Faster</span>
+        <div className="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-md border-t-8 border-t-blue-600">
+          <span className="text-xs uppercase font-extrabold text-blue-800">Avg SLA Speed</span>
+          <p className="text-4xl font-black text-slate-950 mt-1.5 leading-none">{metrics.avg_resolution_time}h</p>
+          <span className="text-[11px] text-blue-800 font-extrabold mt-2 block">⚡ 72% Faster</span>
         </div>
 
-        <div className="gov-card p-5 border-l-4 border-l-orange-500">
-          <span className="text-[10px] uppercase font-bold text-orange-600">Citizen Index</span>
-          <p className="text-3xl font-black text-slate-900 mt-1 leading-none flex items-center gap-1">
+        <div className="bg-white border-2 border-slate-300 rounded-2xl p-5 shadow-md border-t-8 border-t-orange-500">
+          <span className="text-xs uppercase font-extrabold text-orange-700">Citizen Index</span>
+          <p className="text-4xl font-black text-slate-950 mt-1.5 leading-none flex items-center gap-1">
             {metrics.satisfaction_rating}
-            <Star size={18} className="text-amber-500" fill="currentColor" />
+            <Star size={20} className="text-amber-500" fill="currentColor" />
           </p>
-          <span className="text-[10px] text-orange-600 font-bold mt-1 block">Feedback Rating</span>
+          <span className="text-[11px] text-orange-700 font-extrabold mt-2 block">Feedback Rating</span>
         </div>
       </section>
 
@@ -139,27 +139,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang }) => {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Department SLA Bar Chart */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md flex flex-col gap-4">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+        <div className="bg-white border-2 border-slate-300 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col gap-4">
+          <div className="flex justify-between items-center border-b-2 border-slate-200 pb-4">
             <div>
-              <h4 className="font-extrabold text-slate-900 text-sm">Department Performance & SLA Compliance</h4>
-              <p className="text-xs text-slate-500">Comparing assigned vs resolved complaints across central departments.</p>
+              <h4 className="font-black text-slate-950 text-lg">Department Performance & SLA Compliance</h4>
+              <p className="text-xs text-slate-700 font-semibold">Comparing assigned vs resolved complaints across central departments.</p>
             </div>
-            <span className="text-[10px] bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-full border border-blue-200">
+            <span className="text-xs bg-blue-100 text-blue-950 font-black px-3 py-1 rounded-full border-2 border-blue-400">
               Live Feed
             </span>
           </div>
 
-          <div className="h-72 text-xs font-semibold pt-2">
+          <div className="h-72 text-xs font-bold pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={department_performance}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="department" stroke="#64748b" fontSize={10} />
-                <YAxis stroke="#64748b" fontSize={10} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="department" stroke="#0f172a" fontSize={11} />
+                <YAxis stroke="#0f172a" fontSize={11} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '11px' }}
+                  contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: '2px solid #334155', color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
                 />
-                <Legend wrapperStyle={{ paddingTop: '10px', fontSize: '11px' }} />
+                <Legend wrapperStyle={{ paddingTop: '10px', fontSize: '12px', fontWeight: 'bold' }} />
                 <Bar dataKey="assigned" name="Assigned Tasks" fill="#1e3a8a" radius={[6, 6, 0, 0]} />
                 <Bar dataKey="resolved" name="Verified Resolved" fill="#059669" radius={[6, 6, 0, 0]} />
                 <Bar dataKey="breached" name="SLA Breached" fill="#e11d48" radius={[6, 6, 0, 0]} />
@@ -169,18 +169,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang }) => {
         </div>
 
         {/* Category Distribution Donut Chart */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md flex flex-col gap-4">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+        <div className="bg-white border-2 border-slate-300 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col gap-4">
+          <div className="flex justify-between items-center border-b-2 border-slate-200 pb-4">
             <div>
-              <h4 className="font-extrabold text-slate-900 text-sm">Grievance Category Distribution</h4>
-              <p className="text-xs text-slate-500">Distribution by sector category across state municipal bodies.</p>
+              <h4 className="font-black text-slate-950 text-lg">Grievance Category Distribution</h4>
+              <p className="text-xs text-slate-700 font-semibold">Distribution by sector category across state municipal bodies.</p>
             </div>
-            <span className="text-[10px] bg-orange-50 text-orange-700 font-bold px-2.5 py-1 rounded-full border border-orange-200">
+            <span className="text-xs bg-orange-100 text-orange-950 font-black px-3 py-1 rounded-full border-2 border-orange-400">
               AI Categorized
             </span>
           </div>
 
-          <div className="h-72 text-xs font-semibold flex items-center justify-center pt-2">
+          <div className="h-72 text-xs font-bold flex items-center justify-center pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -197,38 +197,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang }) => {
                   ))}
                 </Pie>
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '11px' }}
+                  contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: '2px solid #334155', color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
                 />
-                <Legend layout="vertical" align="right" verticalAlign="middle" iconType="circle" wrapperStyle={{ fontSize: '11px' }} />
+                <Legend layout="vertical" align="right" verticalAlign="middle" iconType="circle" wrapperStyle={{ fontSize: '12px', fontWeight: 'bold' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Intake Trend Line Chart */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md flex flex-col gap-4 lg:col-span-2">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+        <div className="bg-white border-2 border-slate-300 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col gap-4 lg:col-span-2">
+          <div className="flex justify-between items-center border-b-2 border-slate-200 pb-4">
             <div>
-              <h4 className="font-extrabold text-slate-900 text-sm">Monthly Intake vs Redressal Velocity</h4>
-              <p className="text-xs text-slate-500">Monthly trajectory showing complaint filing volume against successful field closures.</p>
+              <h4 className="font-black text-slate-950 text-lg">Monthly Intake vs Redressal Velocity</h4>
+              <p className="text-xs text-slate-700 font-semibold">Monthly trajectory showing complaint filing volume against successful field closures.</p>
             </div>
-            <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-full border border-emerald-200">
+            <span className="text-xs bg-emerald-100 text-emerald-950 font-black px-3 py-1 rounded-full border-2 border-emerald-400">
               +24% Resolution Velocity
             </span>
           </div>
 
-          <div className="h-72 text-xs font-semibold pt-2">
+          <div className="h-72 text-xs font-bold pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthly_trend}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="month" stroke="#64748b" fontSize={11} />
-                <YAxis stroke="#64748b" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="month" stroke="#0f172a" fontSize={11} />
+                <YAxis stroke="#0f172a" fontSize={11} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '11px' }}
+                  contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: '2px solid #334155', color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
                 />
-                <Legend wrapperStyle={{ paddingTop: '10px', fontSize: '11px' }} />
-                <Line type="monotone" dataKey="complaints" name="Complaints Filed" stroke="#f97316" strokeWidth={3.5} dot={{ r: 5, fill: '#ea580c' }} />
-                <Line type="monotone" dataKey="resolved" name="Complaints Resolved" stroke="#059669" strokeWidth={3.5} dot={{ r: 5, fill: '#059669' }} />
+                <Legend wrapperStyle={{ paddingTop: '10px', fontSize: '12px', fontWeight: 'bold' }} />
+                <Line type="monotone" dataKey="complaints" name="Complaints Filed" stroke="#ea580c" strokeWidth={4} dot={{ r: 6, fill: '#ea580c' }} />
+                <Line type="monotone" dataKey="resolved" name="Complaints Resolved" stroke="#059669" strokeWidth={4} dot={{ r: 6, fill: '#059669' }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -237,51 +237,51 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang }) => {
       </section>
 
       {/* High Priority & SLA Breach Watchlist */}
-      <section className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md flex flex-col gap-4">
-        <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+      <section className="bg-white border-2 border-slate-300 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col gap-4">
+        <div className="flex justify-between items-center border-b-2 border-slate-200 pb-4">
           <div className="flex items-center gap-2">
-            <AlertTriangle size={18} className="text-rose-600 animate-bounce" />
-            <h3 className="font-extrabold text-slate-900 text-base">Active High-Priority & Escalated Watchlist</h3>
+            <AlertTriangle size={20} className="text-rose-600 animate-bounce" />
+            <h3 className="font-black text-slate-950 text-xl">Active High-Priority & Escalated Watchlist</h3>
           </div>
-          <span className="text-[10px] bg-rose-50 text-rose-700 font-bold px-2.5 py-1 rounded-full border border-rose-200">
-            Immediate Action Required
+          <span className="text-xs bg-rose-100 text-rose-950 font-black px-3 py-1 rounded-full border-2 border-rose-400">
+            Immediate Nodal Action Required
           </span>
         </div>
         
         {escalatedList.length === 0 ? (
-          <p className="text-xs text-slate-400 py-6 text-center">No escalated complaints in watchlist. SLA compliance target fully met.</p>
+          <p className="text-xs text-slate-600 font-bold py-6 text-center">No escalated complaints in watchlist. SLA compliance target fully met.</p>
         ) : (
-          <div className="overflow-x-auto text-xs">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto rounded-2xl border-2 border-slate-300 shadow-md">
+            <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 text-[10px] uppercase font-bold text-slate-400 bg-slate-50">
-                  <th className="py-3 px-4">Grievance ID</th>
-                  <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4">Priority Level</th>
-                  <th className="py-3 px-4">Filing Date</th>
-                  <th className="py-3 px-4">SLA Deadline</th>
-                  <th className="py-3 px-4">Current Status</th>
-                  <th className="py-3 px-4">System Escalation Trigger</th>
+                <tr className="border-b-2 border-slate-950 text-xs font-black text-white bg-slate-900">
+                  <th className="py-4 px-4">Grievance ID</th>
+                  <th className="py-4 px-4">Category</th>
+                  <th className="py-4 px-4">Priority Level</th>
+                  <th className="py-4 px-4">Filing Date</th>
+                  <th className="py-4 px-4">SLA Deadline</th>
+                  <th className="py-4 px-4">Current Status</th>
+                  <th className="py-4 px-4">System Escalation Trigger</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y-2 divide-slate-200">
                 {escalatedList.map(g => (
-                  <tr key={g.id} className="border-b border-slate-100 hover:bg-slate-50 transition-all font-medium">
-                    <td className="py-3.5 px-4 font-mono font-extrabold text-slate-900">{g.id}</td>
-                    <td className="py-3.5 px-4 text-slate-700 font-bold">{g.category}</td>
-                    <td className="py-3.5 px-4">
-                      <span className="px-2.5 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-300">
+                  <tr key={g.id} className="hover:bg-rose-50/50 transition-all odd:bg-white even:bg-slate-50 font-bold text-slate-950">
+                    <td className="py-4 px-4 font-mono font-black text-slate-950 text-sm">{g.id}</td>
+                    <td className="py-4 px-4 text-slate-950 font-black">{g.category}</td>
+                    <td className="py-4 px-4">
+                      <span className="px-2.5 py-1 rounded-xl text-[10px] font-black bg-rose-200 text-rose-950 border-2 border-rose-400">
                         {g.priority}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-400">{new Date(g.createdAt).toLocaleDateString()}</td>
-                    <td className="py-3.5 px-4 text-rose-600 font-extrabold">{new Date(g.slaDeadline).toLocaleDateString()}</td>
-                    <td className="py-3.5 px-4">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold text-rose-700 bg-rose-50 border border-rose-200">
+                    <td className="py-4 px-4 text-slate-700">{new Date(g.createdAt).toLocaleDateString()}</td>
+                    <td className="py-4 px-4 text-rose-700 font-black">{new Date(g.slaDeadline).toLocaleDateString()}</td>
+                    <td className="py-4 px-4">
+                      <span className="px-3 py-1 rounded-full text-[11px] font-black text-rose-950 bg-rose-100 border-2 border-rose-400">
                         {g.status}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-600 italic">SLA timeframe (96h) exceeded — Auto routed to Division Nodal Chief.</td>
+                    <td className="py-4 px-4 text-slate-800 font-semibold italic">SLA timeframe (96h) exceeded — Auto routed to Division Nodal Chief.</td>
                   </tr>
                 ))}
               </tbody>
