@@ -7,13 +7,7 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
-class UserRegister(BaseModel):
-    name: str
-    email: EmailStr
-    phone: str
-    password: str
-    city: Optional[str] = None
-    state: Optional[str] = None
+
 
 class UserResponse(BaseModel):
     id: str
