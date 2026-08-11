@@ -137,7 +137,7 @@ The AI engine in `backend/services/ai_service.py` is fully decoupled from the ro
 
 ## Connecting Live Supabase Database
 
-
+The backend client in `backend/database.py` and frontend in `src/services/supabaseClient.ts` support dual-mode database operations:
 
 1.  Run the PostgreSQL migration scripts in the `supabase/schema.sql` inside your Supabase project SQL Editor.
 2.  Seed default complaints via `supabase/seed.sql`.
