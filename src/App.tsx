@@ -31,10 +31,51 @@ const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState('home');
   const [lang, setLang] = useState<Language>('en');
   const [selectedGrievanceId, setSelectedGrievanceId] = useState<string>('');
+  const [fontSize, setFontSize] = useState<number>(1.0);
+  const [highContrast, setHighContrast] = useState<boolean>(false);
   
   // Notification center
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [userName, setUserName] = useState('Rahul Verma');
+
+  useEffect(() => {
+    document.body.style.fontSize = fontSize === 1.0 ? '' : `${fontSize}em`;
+  }, [fontSize]);
+
+  useEffect(() => {
+    const styleId = 'jansetu-hc-style';
+    let styleEl = document.getElementById(styleId);
+    if (highContrast) {
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = styleId;
+        styleEl.innerHTML = `
+          .high-contrast, .high-contrast body, .high-contrast main, .high-contrast header, .high-contrast footer, .high-contrast div, .high-contrast section, .high-contrast table, .high-contrast tr, .high-contrast td, .high-contrast th, .high-contrast h1, .high-contrast h2, .high-contrast h3, .high-contrast h4, .high-contrast h5, .high-contrast h6, .high-contrast p, .high-contrast span, .high-contrast label, .high-contrast button, .high-contrast select, .high-contrast textarea, .high-contrast input {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+            border-color: #ffffff !important;
+            text-shadow: none !important;
+            box-shadow: none !important;
+          }
+          .high-contrast button, .high-contrast a, .high-contrast input[type="submit"] {
+            border: 2px solid #ffffff !important;
+            background-color: #000000 !important;
+            color: #ffff00 !important;
+          }
+          .high-contrast input, .high-contrast select, .high-contrast textarea {
+            border: 1.5px solid #ffffff !important;
+            background-color: #000000 !important;
+            color: #ffffff !important;
+          }
+        `;
+        document.head.appendChild(styleEl);
+      }
+    } else {
+      if (styleEl) {
+        styleEl.remove();
+      }
+    }
+  }, [highContrast]);
 
   const fetchNotifications = async () => {
     // Read from localStorage (api syncs updates to localStorage)
@@ -246,6 +287,10 @@ const App: React.FC = () => {
         notifications={notifications}
         onMarkNotifRead={handleMarkNotifRead}
         userName={userName}
+        fontSize={fontSize}
+        onFontSizeChange={setFontSize}
+        highContrast={highContrast}
+        onHighContrastChange={setHighContrast}
       />
 
       {/* Primary Page views router */}

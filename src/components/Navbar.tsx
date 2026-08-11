@@ -12,6 +12,10 @@ interface NavbarProps {
   notifications: Notification[];
   onMarkNotifRead: (id: string) => void;
   userName: string;
+  fontSize: number;
+  onFontSizeChange: (size: number) => void;
+  highContrast: boolean;
+  onHighContrastChange: (hc: boolean) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -22,7 +26,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   role,
   notifications,
   onMarkNotifRead,
-  userName
+  userName,
+  fontSize,
+  onFontSizeChange,
+  highContrast,
+  onHighContrastChange
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -43,15 +51,31 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
+      {/* Tri-Color Border Bar Accent */}
+      <div className="h-1 bg-gradient-to-r from-orange-500 via-white to-emerald-600"></div>
+
       {/* Emblem Strip */}
       <div className="bg-slate-100 py-1 text-[10px] text-slate-500 px-4 md:px-12 flex justify-between items-center border-b border-slate-200">
-        <div className="flex items-center gap-1.5 font-medium">
+        <div className="flex items-center gap-1.5 font-semibold">
           <span>🇮🇳</span>
           <span>Government of India</span>
           <span className="text-slate-300">|</span>
-          <span className="hidden sm:inline">Ministry of Electronics & Information Technology</span>
+          <span className="hidden sm:inline">Ministry of Electronics & Information Technology (MeitY)</span>
         </div>
         <div className="flex items-center gap-3">
+          {/* Accessibility controls */}
+          <div className="flex items-center gap-1 border-r border-slate-300 pr-3">
+            <button onClick={() => onFontSizeChange(0.9)} className="px-1.5 py-0.5 hover:bg-slate-200 rounded font-bold text-[9px] border border-slate-300 bg-white text-slate-700">A-</button>
+            <button onClick={() => onFontSizeChange(1.0)} className="px-1.5 py-0.5 hover:bg-slate-200 rounded font-bold text-[9px] border border-slate-300 bg-white text-slate-750">A</button>
+            <button onClick={() => onFontSizeChange(1.15)} className="px-1.5 py-0.5 hover:bg-slate-200 rounded font-bold text-[9px] border border-slate-300 bg-white text-slate-700">A+</button>
+          </div>
+          <button 
+            onClick={() => onHighContrastChange(!highContrast)} 
+            className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-white rounded text-[9px] font-bold border border-slate-700 flex items-center gap-1"
+          >
+            🌓 Contrast
+          </button>
+          <span className="text-slate-300">|</span>
           <span className="font-semibold tracking-wider text-orange-600">JanSetu-AI Civic Portal</span>
         </div>
       </div>
