@@ -222,51 +222,69 @@ const App: React.FC = () => {
   // 1. SIGN IN SCREEN VIEW
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
-
-        {/* Brand Header */}
-        <div className="sm:mx-auto sm:w-full sm:max-w-md text-center relative z-10 flex flex-col items-center mb-6">
-          <div className="p-3 bg-white/10 rounded-2xl border border-white/20 mb-3 text-orange-400">
-            <Landmark size={32} />
+      <div className="min-h-screen bg-slate-100 flex flex-col justify-between relative text-slate-900 font-sans">
+        {/* Top Government Emblem Header */}
+        <div>
+          <div className="h-1.5 bg-gradient-to-r from-orange-500 via-white to-emerald-600"></div>
+          <div className="bg-slate-900 text-white py-2 px-4 md:px-12 flex justify-between items-center text-xs font-medium border-b border-slate-800">
+            <div className="flex items-center gap-2">
+              <span>🇮🇳</span>
+              <span className="font-bold tracking-wide">Government of India • भारत सरकार</span>
+              <span className="hidden sm:inline text-slate-400">|</span>
+              <span className="hidden sm:inline text-slate-300">CPGRAMS Portal</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-slate-400">🌐 Select Language:</span>
+              <select
+                value={lang}
+                onChange={(e) => setLang(e.target.value as Language)}
+                className="bg-slate-800 border border-slate-700 rounded px-2 py-0.5 text-xs text-white focus:outline-none cursor-pointer"
+              >
+                <option value="en">English (EN)</option>
+                <option value="hi">हिन्दी (Hindi)</option>
+                <option value="gu">ગુજરાતી (Gujarati)</option>
+              </select>
+            </div>
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight">{translate('title', lang)}</h2>
-          <p className="text-xs font-semibold tracking-wider text-orange-400 uppercase mt-1">
-            {translate('tagline', lang)}
-          </p>
+
+          {/* Deep Navy Header Banner */}
+          <div className="gov-header-bg py-8 px-4 text-white text-center shadow-md border-b-4 border-amber-500">
+            <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="p-3 bg-white/10 rounded-2xl border border-white/20 text-amber-400 shrink-0">
+                <Landmark size={40} />
+              </div>
+              <div className="text-center sm:text-left">
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                  {translate('title', lang)}
+                </h1>
+                <p className="text-xs sm:text-sm font-semibold tracking-wider text-amber-300 uppercase mt-1">
+                  Central Public Grievance Redress & Monitoring System (CPGRAMS)
+                </p>
+                <p className="text-[11px] text-slate-300 mt-1">
+                  Ministry of Electronics & Information Technology • National Informatics Centre (NIC)
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Side-by-Side Dual Column Portal */}
-        <div className="mt-2 sm:mx-auto sm:w-full sm:max-w-4xl relative z-10">
-          <div className="bg-slate-900 border border-slate-800 shadow-premium rounded-3xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+        {/* Main Login Card Portal */}
+        <div className="my-8 px-4 sm:mx-auto sm:w-full sm:max-w-4xl">
+          <div className="bg-white border border-slate-300 shadow-gov-lg rounded-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
             
-            {/* Left Column: Interactive Form */}
-            <div className="p-6 md:p-10 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-800">
-              
-              {/* Language switcher dropdown inside login form */}
-              <div className="flex justify-end gap-1.5 mb-6 text-[11px] font-bold text-slate-500 items-center">
-                <span>🌐 Language / भाषा:</span>
-                <select
-                  value={lang}
-                  onChange={(e) => setLang(e.target.value as Language)}
-                  className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-white focus:border-orange-500 focus:outline-none cursor-pointer font-sans"
-                >
-                  <option value="en">English (EN)</option>
-                  <option value="hi">हिन्दी (Hindi)</option>
-                  <option value="gu">ગુજરાતી (Gujarati)</option>
-                </select>
-              </div>
-
-              {/* Mobile + OTP Flow */}
+            {/* Left Column: Mobile + OTP Form */}
+            <div className="p-6 md:p-8 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-200 bg-white">
               <div className="space-y-4">
-                <h4 className="font-extrabold text-sm text-slate-200">{translate('login_title', lang)}</h4>
+                <div className="border-b border-slate-200 pb-3">
+                  <h3 className="font-extrabold text-base text-slate-900">{translate('login_title', lang)}</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Official Citizen SMS Authentication Portal</p>
+                </div>
                 
                 {!otpSent ? (
                   /* Step 1: Input Mobile */
-                  <form onSubmit={handleSendOtp} className="space-y-4">
+                  <form onSubmit={handleSendOtp} className="space-y-4 pt-2">
                     <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      <label className="block text-xs font-bold text-slate-700 mb-1.5">
                         {translate('login_mobile_label', lang)}
                       </label>
                       <div className="relative">
@@ -278,26 +296,26 @@ const App: React.FC = () => {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                           placeholder={translate('login_mobile_placeholder', lang)}
-                          className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-12 pr-4 py-3 text-sm text-white font-mono focus:border-orange-500 focus:outline-none"
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-12 pr-4 py-3 text-sm text-slate-900 font-mono font-bold focus:border-blue-600 focus:bg-white focus:outline-none"
                         />
                       </div>
                     </div>
 
-                    {authError && <p className="text-rose-500 text-xs font-semibold">⚠️ {authError}</p>}
+                    {authError && <p className="text-rose-600 text-xs font-semibold">⚠️ {authError}</p>}
 
                     <button
                       type="submit"
                       disabled={otpLoading}
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all disabled:opacity-60 flex justify-center items-center gap-1.5"
+                      className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider shadow-sm transition-all disabled:opacity-60 flex justify-center items-center gap-1.5"
                     >
-                      {otpLoading ? 'Sending...' : translate('login_btn_send_otp', lang)}
+                      {otpLoading ? 'Sending Code...' : translate('login_btn_send_otp', lang)}
                     </button>
                   </form>
                 ) : (
                   /* Step 2: Input OTP */
-                  <form onSubmit={handleVerifyOtp} className="space-y-4">
+                  <form onSubmit={handleVerifyOtp} className="space-y-4 pt-2">
                     <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      <label className="block text-xs font-bold text-slate-700 mb-1.5">
                         {translate('login_otp_label', lang)}
                       </label>
                       <input
@@ -307,26 +325,26 @@ const App: React.FC = () => {
                         value={otp}
                         onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                         placeholder={translate('login_otp_placeholder', lang)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-center font-bold font-mono tracking-widest text-white focus:border-orange-500 focus:outline-none"
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-center font-bold font-mono tracking-widest text-slate-900 focus:border-blue-600 focus:bg-white focus:outline-none"
                       />
-                      <p className="text-[10px] text-slate-500 mt-1">SMS sent to +91 {phone}. Enter **1234** for verification.</p>
+                      <p className="text-[11px] text-slate-500 mt-1.5 font-medium">SMS code dispatched to +91 {phone}. Enter **1234** for verification.</p>
                     </div>
 
-                    {authError && <p className="text-rose-500 text-xs font-semibold">⚠️ {authError}</p>}
+                    {authError && <p className="text-rose-600 text-xs font-semibold">⚠️ {authError}</p>}
 
                     <button
                       type="submit"
                       disabled={authLoading}
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all disabled:opacity-60"
+                      className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider shadow-sm transition-all disabled:opacity-60"
                     >
                       {authLoading ? 'Verifying...' : translate('login_btn_verify_otp', lang)}
                     </button>
 
-                    <div className="text-center pt-2">
+                    <div className="text-center pt-1">
                       <button
                         type="button"
                         onClick={() => { setOtpSent(false); setOtp(''); }}
-                        className="text-[10px] text-slate-400 hover:text-white underline font-bold"
+                        className="text-xs text-blue-700 hover:text-blue-900 underline font-bold"
                       >
                         {translate('login_change_phone', lang)}
                       </button>
@@ -336,75 +354,74 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Column: Step-by-Step Instructions & Helpers */}
-            <div className="p-6 md:p-10 bg-slate-950 flex flex-col justify-between gap-6">
+            {/* Right Column: Government Guidelines & Help Panel */}
+            <div className="p-6 md:p-8 bg-slate-50 flex flex-col justify-between gap-6">
               <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="font-extrabold text-sm text-slate-200">{translate('login_how_to_title', lang)}</h4>
+                <div className="flex justify-between items-center mb-4 border-b border-slate-200 pb-2">
+                  <h4 className="font-extrabold text-sm text-slate-800">{translate('login_how_to_title', lang)}</h4>
                   
-                  {/* Voice help speaker */}
+                  {/* Voice guide button */}
                   <button
                     onClick={playVoiceGuide}
-                    className="flex items-center gap-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 px-2.5 py-1 rounded-full text-[9px] font-black text-orange-400 active:scale-95 transition-all"
-                    title="Play voice guide instructions"
+                    className="flex items-center gap-1 bg-amber-100 border border-amber-300 hover:bg-amber-200 px-2.5 py-1 rounded-full text-[10px] font-bold text-amber-900 active:scale-95 transition-all"
                   >
                     {translate('login_btn_read_guide', lang)}
                   </button>
                 </div>
 
-                <div className="space-y-4 text-[11px] leading-relaxed text-slate-400">
-                  <div className="flex gap-2.5">
-                    <span className="h-5 w-5 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center font-bold text-[10px] shrink-0">1</span>
+                <div className="space-y-4 text-xs text-slate-600 leading-relaxed">
+                  <div className="flex gap-3">
+                    <span className="h-6 w-6 rounded-full bg-blue-100 border border-blue-300 text-blue-900 flex items-center justify-center font-bold text-xs shrink-0">1</span>
                     <div>
-                      <p className="font-bold text-slate-200">{translate('login_step_1_title', lang)}</p>
-                      <p className="mt-0.5">{translate('login_step_1_desc', lang)}</p>
+                      <p className="font-bold text-slate-900">{translate('login_step_1_title', lang)}</p>
+                      <p className="mt-0.5 text-[11px]">{translate('login_step_1_desc', lang)}</p>
                     </div>
                   </div>
-                  <div className="flex gap-2.5">
-                    <span className="h-5 w-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0">2</span>
+                  <div className="flex gap-3">
+                    <span className="h-6 w-6 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-900 flex items-center justify-center font-bold text-xs shrink-0">2</span>
                     <div>
-                      <p className="font-bold text-slate-200">{translate('login_step_2_title', lang)}</p>
-                      <p className="mt-0.5">{translate('login_step_2_desc', lang)}</p>
+                      <p className="font-bold text-slate-900">{translate('login_step_2_title', lang)}</p>
+                      <p className="mt-0.5 text-[11px]">{translate('login_step_2_desc', lang)}</p>
                     </div>
                   </div>
-                  <div className="flex gap-2.5">
-                    <span className="h-5 w-5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center font-bold text-[10px] shrink-0">3</span>
+                  <div className="flex gap-3">
+                    <span className="h-6 w-6 rounded-full bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center font-bold text-xs shrink-0">3</span>
                     <div>
-                      <p className="font-bold text-slate-200">{translate('login_step_3_title', lang)}</p>
-                      <p className="mt-0.5">{translate('login_step_3_desc', lang)}</p>
+                      <p className="font-bold text-slate-900">{translate('login_step_3_title', lang)}</p>
+                      <p className="mt-0.5 text-[11px]">{translate('login_step_3_desc', lang)}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* 1-Click bypass testing */}
-              <div className="border-t border-slate-900 pt-5">
-                <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider block mb-2 text-center lg:text-left">
+              {/* 1-Click Fast Demo Selectors */}
+              <div className="border-t border-slate-200 pt-4">
+                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-2">
                   {translate('login_demo_title', lang)}
                 </span>
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => handleDemoLogin('citizen')}
-                    className="bg-slate-900 border border-slate-800 hover:border-orange-500 py-2 rounded-xl text-[9px] font-bold text-slate-300 hover:text-white flex flex-col items-center gap-1 transition-all"
+                    className="bg-white border border-slate-300 hover:border-amber-500 hover:bg-amber-50 py-2 rounded-xl text-[10px] font-bold text-slate-700 hover:text-amber-900 flex flex-col items-center gap-1 shadow-sm transition-all"
                   >
-                    <UserCheck size={12} className="text-orange-400" />
+                    <UserCheck size={14} className="text-amber-600" />
                     Citizen
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDemoLogin('officer')}
-                    className="bg-slate-900 border border-slate-800 hover:border-indigo-500 py-2 rounded-xl text-[9px] font-bold text-slate-300 hover:text-white flex flex-col items-center gap-1 transition-all"
+                    className="bg-white border border-slate-300 hover:border-blue-500 hover:bg-blue-50 py-2 rounded-xl text-[10px] font-bold text-slate-700 hover:text-blue-900 flex flex-col items-center gap-1 shadow-sm transition-all"
                   >
-                    <ShieldCheck size={12} className="text-indigo-400" />
+                    <ShieldCheck size={14} className="text-blue-700" />
                     Officer
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDemoLogin('admin')}
-                    className="bg-slate-900 border border-slate-800 hover:border-emerald-500 py-2 rounded-xl text-[9px] font-bold text-slate-300 hover:text-white flex flex-col items-center gap-1 transition-all"
+                    className="bg-white border border-slate-300 hover:border-emerald-500 hover:bg-emerald-50 py-2 rounded-xl text-[10px] font-bold text-slate-700 hover:text-emerald-900 flex flex-col items-center gap-1 shadow-sm transition-all"
                   >
-                    <Key size={12} className="text-emerald-400" />
+                    <Key size={14} className="text-emerald-700" />
                     Admin
                   </button>
                 </div>
@@ -413,6 +430,11 @@ const App: React.FC = () => {
             </div>
 
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="bg-slate-900 text-slate-400 py-3 px-4 text-center text-xs border-t border-slate-800">
+          <p>© 2026 CPGRAMS JanSetu-AI • Designed & Developed for Ministry of Electronics & Information Technology, Government of India</p>
         </div>
       </div>
     );
