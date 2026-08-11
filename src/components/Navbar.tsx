@@ -16,6 +16,7 @@ interface NavbarProps {
   onFontSizeChange: (size: number) => void;
   highContrast: boolean;
   onHighContrastChange: (hc: boolean) => void;
+  onLogout: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -30,7 +31,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   fontSize,
   onFontSizeChange,
   highContrast,
-  onHighContrastChange
+  onHighContrastChange,
+  onLogout
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -219,6 +221,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                 🏛️ National Control Center
               </button>
               <button
+                onClick={() => handleNavClick('manage-grievances')}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${currentTab === 'manage-grievances' ? 'bg-slate-100 text-slate-950 font-bold' : 'text-slate-600 hover:text-slate-950'}`}
+              >
+                Manage Grievances
+              </button>
+              <button
+                onClick={() => handleNavClick('manage-officers')}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${currentTab === 'manage-officers' ? 'bg-slate-100 text-slate-950 font-bold' : 'text-slate-600 hover:text-slate-950'}`}
+              >
+                Manage Officers
+              </button>
+              <button
+                onClick={() => handleNavClick('system-settings')}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${currentTab === 'system-settings' ? 'bg-slate-100 text-slate-950 font-bold' : 'text-slate-600 hover:text-slate-950'}`}
+              >
+                System Settings
+              </button>
+              <button
                 onClick={() => handleNavClick('ai-architecture')}
                 className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${currentTab === 'ai-architecture' ? 'bg-emerald-900 text-white shadow-md' : 'text-slate-700 hover:bg-white hover:text-slate-950'}`}
               >
@@ -328,8 +348,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
             <div className="text-right">
               <p className="text-xs font-bold text-slate-900 leading-none">{userName}</p>
-              <p className="text-[9px] text-emerald-600 font-semibold leading-none mt-1">Verified Citizen</p>
+              <p className="text-[10px] text-slate-400 leading-none mt-1">ID: {role === 'citizen' ? 'usr_citizen' : role === 'admin' ? 'usr_admin' : 'usr_officer'}</p>
             </div>
+            <button
+              onClick={onLogout}
+              className="p-1.5 border border-slate-200 rounded-lg text-slate-400 hover:text-rose-500 hover:border-rose-200 hover:bg-rose-50 transition-all"
+              title="Sign out"
+            >
+              <LogOut size={14} />
+            </button>
           </div>
 
           {/* Mobile Drawer Trigger */}
@@ -406,6 +433,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                 National Control Center
               </button>
               <button
+                onClick={() => handleNavClick('manage-grievances')}
+                className={`w-full text-left px-4 py-2 text-sm font-semibold rounded-lg ${currentTab === 'manage-grievances' ? 'bg-slate-100 text-slate-950' : 'text-slate-600'}`}
+              >
+                Manage Grievances
+              </button>
+              <button
+                onClick={() => handleNavClick('manage-officers')}
+                className={`w-full text-left px-4 py-2 text-sm font-semibold rounded-lg ${currentTab === 'manage-officers' ? 'bg-slate-100 text-slate-950' : 'text-slate-600'}`}
+              >
+                Manage Officers
+              </button>
+              <button
+                onClick={() => handleNavClick('system-settings')}
+                className={`w-full text-left px-4 py-2 text-sm font-semibold rounded-lg ${currentTab === 'system-settings' ? 'bg-slate-100 text-slate-950' : 'text-slate-600'}`}
+              >
+                System Settings
+              </button>
+              <button
                 onClick={() => handleNavClick('ai-architecture')}
                 className={`w-full text-left px-4 py-2.5 text-xs font-bold rounded-xl ${currentTab === 'ai-architecture' ? 'bg-emerald-900 text-white' : 'text-slate-700 hover:bg-slate-50'}`}
               >
@@ -413,6 +458,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </>
           )}
+          <div className="border-t border-slate-100 pt-2.5 mt-1 flex items-center justify-between px-4">
+            <div className="flex items-center gap-2">
+              <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${getRoleColor()}`}>
+                {role}
+              </span>
+              <span className="text-xs font-bold text-slate-900">{userName}</span>
+            </div>
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-1 text-[10px] font-bold text-rose-500 hover:text-rose-700 transition-all"
+            >
+              <LogOut size={12} /> Sign Out
+            </button>
+          </div>
         </div>
       )}
     </header>
