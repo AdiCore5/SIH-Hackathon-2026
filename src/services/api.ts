@@ -6,7 +6,10 @@ import {
   AIAnalysisResult, 
   DuplicateCheckResult, 
   Notification,
-  UserRole
+  UserRole,
+  Officer,
+  LocationInfo,
+  GrievanceStatus
 } from '../types';
 
 const API_BASE_URL = 'http://localhost:8000/api';
@@ -272,7 +275,7 @@ export const api = {
     }
     
     // Local Fallback Authentication
-    const users: User[] = getLocalStorage('js_users', MOCK_USERS);
+    const users = getLocalStorage<User[]>('js_users', MOCK_USERS);
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     if (user && password === 'Demo@123') {
       return {
@@ -305,7 +308,7 @@ export const api = {
     }
     
     // Local Fallback Filter
-    let grievances: Grievance[] = getLocalStorage('js_grievances', []);
+    let grievances = getLocalStorage<Grievance[]>('js_grievances', []);
     if (filters.departmentId) {
       grievances = grievances.filter(g => g.departmentId === filters.departmentId);
     }
@@ -341,17 +344,17 @@ export const api = {
     }
     
     // Local Fallback detail build
-    const grievances: Grievance[] = getLocalStorage('js_grievances', []);
+    const grievances = getLocalStorage<Grievance[]>('js_grievances', []);
     const grievance = grievances.find(g => g.id === id);
     if (!grievance) throw new Error('Grievance not found');
     
-    const updates: GrievanceUpdate[] = getLocalStorage('js_updates', []);
+    const updates = getLocalStorage<GrievanceUpdate[]>('js_updates', []);
     const timeline = updates.filter(u => u.grievanceId === id).sort((a,b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
     
-    const feedbacks: Feedback[] = getLocalStorage('js_feedback', []);
+    const feedbacks = getLocalStorage<Feedback[]>('js_feedback', []);
     const feedback = feedbacks.find(f => f.grievanceId === id);
     
-    const officers = getLocalStorage('js_officers', MOCK_OFFICERS);
+    const officers = getLocalStorage<Officer[]>('js_officers', MOCK_OFFICERS);
     const officer = officers.find(o => o.id === grievance.assignedOfficerId);
     
     return {
@@ -364,7 +367,7 @@ export const api = {
   },
 
   // Grievance: Create with local AI classification
-  async lodgeGrievance(description: string, location: { city: string; ward: string; address?: string }, title: string, citizenId: string, evidenceUrls: string[] = []): Promise<{ success: boolean; grievance: Grievance; duplicateAlert: DuplicateCheckResult }> {
+  async lodgeGrievance(description: string, location: LocationInfo, title: string, citizenId: string, evidenceUrls: string[] = []): Promise<{ success: boolean; grievance: Grievance; duplicateAlert: DuplicateCheckResult }> {
     const online = await this.isServerOnline();
     if (online) {
       try {
@@ -438,7 +441,7 @@ export const api = {
     const matchedOfficer = officers.find(o => o.departmentId === bestDept);
     
     // Generate Grievance ID
-    const grievances = getLocalStorage('js_grievances', []);
+    const grievances = getLocalStorage<Grievance[]>('js_grievances', []);
     const nextNum = grievances.length + 1251;
     const gid = `JS-2026-00${nextNum}`;
     
@@ -490,7 +493,7 @@ export const api = {
     setLocalStorage('js_grievances', grievances);
     
     // Save updates log
-    const updates = getLocalStorage('js_updates', []);
+    const updates = getLocalStorage<GrievanceUpdate[]>('js_updates', []);
     updates.push(
       { id: `u_n_${updates.length}`, grievanceId: gid, status: 'Submitted', remark: 'Complaint lodged by citizen.', updatedBy: 'Citizen System', timestamp: new Date().toISOString() },
       { id: `u_a_${updates.length}`, grievanceId: gid, status: 'AI Classified', remark: `AI classified Category: ${bestCat}, Dept: ${bestDept}, SLA: ${priority}`, updatedBy: 'JanSetu AI', timestamp: new Date().toISOString() },
@@ -529,11 +532,11 @@ export const api = {
     }
     
     // Local Fallback Update
-    const grievances = getLocalStorage('js_grievances', []);
+    const grievances = getLocalStorage<Grievance[]>('js_grievances', []);
     const gIndex = grievances.findIndex((g: any) => g.id === id);
     if (gIndex !== -1) {
       const now = new Date().toISOString();
-      grievances[gIndex].status = status;
+      grievances[gIndex].status = status as GrievanceStatus;
       grievances[gIndex].updatedAt = now;
       if (status === 'Resolved') {
         grievances[gIndex].resolvedAt = now;
@@ -541,7 +544,7 @@ export const api = {
       setLocalStorage('js_grievances', grievances);
       
       // Update updates logs
-      const updates = getLocalStorage('js_updates', []);
+      const updates = getLocalStorage<GrievanceUpdate[]>('js_updates', []);
       updates.push({
         id: `u_up_${updates.length}`,
         grievanceId: id,
@@ -554,7 +557,7 @@ export const api = {
       setLocalStorage('js_updates', updates);
       
       // Push notification
-      const notifications = getLocalStorage('js_notifications', []);
+      const notifications = getLocalStorage<Notification[]>('js_notifications', []);
       notifications.unshift({
         id: `n_up_${notifications.length}`,
         userId: "usr_citizen",
@@ -593,7 +596,7 @@ export const api = {
     }
     
     // Local Fallback Feedback
-    const feedbacks = getLocalStorage('js_feedback', []);
+    const feedbacks = getLocalStorage<Feedback[]>('js_feedback', []);
     feedbacks.push({
       id: `fb_${feedbacks.length}`,
       grievanceId: id,
@@ -637,7 +640,7 @@ export const api = {
     
     // Local Fallback Chat Logic
     const cleaned = message.toLowerCase();
-    const grievances = getLocalStorage('js_grievances', []);
+    const grievances = getLocalStorage<Grievance[]>('js_grievances', []);
     
     // ID Check
     const idMatch = cleaned.match(/js-\d{4}-\d+/);
@@ -715,7 +718,7 @@ export const api = {
     }
     
     // Local Fallback Analytics
-    const grievances: Grievance[] = getLocalStorage('js_grievances', []);
+    const grievances = getLocalStorage<Grievance[]>('js_grievances', []);
     const total = grievances.length;
     const resolved = grievances.filter(g => g.status === 'Resolved' || g.status === 'Closed').length;
     const pending = grievances.filter(g => g.status !== 'Resolved' && g.status !== 'Closed' && g.status !== 'Escalated').length;

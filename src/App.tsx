@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { UserRole, Language, Notification } from './types';
-import { translate } from './services/i18n';
+import { UserRole, Notification } from './types';
+import { translate, Language } from './services/i18n';
 import { api } from './services/api';
 import { DemoBar } from './components/DemoBar';
 import { Navbar } from './components/Navbar';
