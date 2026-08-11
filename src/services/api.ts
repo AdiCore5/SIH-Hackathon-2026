@@ -837,5 +837,177 @@ export const api = {
       };
     }
     throw new Error('Invalid OTP code. Please enter 1234 to verify the demo.');
+  },
+
+  // ==========================================
+  // ADMIN POWER OPERATIONS
+  // ==========================================
+
+  // Admin Login with Access Code
+  async adminLogin(email: string, password: string, accessCode: string): Promise<{ success: boolean; token: string; user: User }> {
+    if (accessCode !== 'ADMIN-2026') {
+      throw new Error('Invalid Admin Access Code. Use ADMIN-2026 for demo.');
+    }
+    const users = getLocalStorage<User[]>('js_users', MOCK_USERS);
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.role === 'admin');
+    if (user && password === 'Demo@123') {
+      return { success: true, token: `admin-jwt-token-${user.id}`, user };
+    }
+    throw new Error('Invalid admin credentials. Use demo.admin@jansetu.ai / Demo@123');
+  },
+
+  // Officer Management
+  async getOfficers(): Promise<Officer[]> {
+    return getLocalStorage<Officer[]>('js_officers', MOCK_OFFICERS);
+  },
+
+  async addOfficer(data: { name: string; departmentId: string; zone: string; email: string; phone: string }): Promise<Officer> {
+    const officers = getLocalStorage<Officer[]>('js_officers', MOCK_OFFICERS);
+    const newOfficer: Officer = {
+      id: `off_${Date.now()}`,
+      name: data.name,
+      departmentId: data.departmentId,
+      zone: data.zone,
+      email: data.email,
+      phone: data.phone,
+      active: true
+    };
+    officers.push(newOfficer);
+    setLocalStorage('js_officers', officers);
+    return newOfficer;
+  },
+
+  async removeOfficer(id: string): Promise<boolean> {
+    let officers = getLocalStorage<Officer[]>('js_officers', MOCK_OFFICERS);
+    officers = officers.filter(o => o.id !== id);
+    setLocalStorage('js_officers', officers);
+    return true;
+  },
+
+  async toggleOfficerActive(id: string): Promise<boolean> {
+    const officers = getLocalStorage<Officer[]>('js_officers', MOCK_OFFICERS);
+    const idx = officers.findIndex(o => o.id === id);
+    if (idx !== -1) {
+      officers[idx].active = !officers[idx].active;
+      setLocalStorage('js_officers', officers);
+      return true;
+    }
+    return false;
+  },
+
+  // Grievance Admin Operations
+  async reassignGrievance(grievanceId: string, newOfficerId: string): Promise<boolean> {
+    const grievances = getLocalStorage<Grievance[]>('js_grievances', []);
+    const officers = getLocalStorage<Officer[]>('js_officers', MOCK_OFFICERS);
+    const gIdx = grievances.findIndex(g => g.id === grievanceId);
+    const officer = officers.find(o => o.id === newOfficerId);
+    if (gIdx !== -1 && officer) {
+      const now = new Date().toISOString();
+      grievances[gIdx].assignedOfficerId = newOfficerId;
+      grievances[gIdx].assignedOfficerName = officer.name;
+      grievances[gIdx].departmentId = officer.departmentId;
+      grievances[gIdx].updatedAt = now;
+      if (grievances[gIdx].status === 'Submitted' || grievances[gIdx].status === 'AI Classified') {
+        grievances[gIdx].status = 'Assigned';
+      }
+      setLocalStorage('js_grievances', grievances);
+
+      const updates = getLocalStorage<GrievanceUpdate[]>('js_updates', []);
+      updates.push({
+        id: `u_admin_${updates.length}`,
+        grievanceId,
+        status: grievances[gIdx].status,
+        remark: `Admin reassigned to Officer ${officer.name} (${officer.departmentId}).`,
+        updatedBy: 'Admin Command Center',
+        timestamp: now
+      });
+      setLocalStorage('js_updates', updates);
+      return true;
+    }
+    return false;
+  },
+
+  async forceEscalate(grievanceId: string): Promise<boolean> {
+    return this.updateStatus(grievanceId, 'Escalated', 'Admin forced escalation via Command Center.', 'Admin Command Center');
+  },
+
+  async forceClose(grievanceId: string, remark: string): Promise<boolean> {
+    const grievances = getLocalStorage<Grievance[]>('js_grievances', []);
+    const gIdx = grievances.findIndex(g => g.id === grievanceId);
+    if (gIdx !== -1) {
+      const now = new Date().toISOString();
+      grievances[gIdx].status = 'Closed';
+      grievances[gIdx].updatedAt = now;
+      grievances[gIdx].resolvedAt = now;
+      setLocalStorage('js_grievances', grievances);
+
+      const updates = getLocalStorage<GrievanceUpdate[]>('js_updates', []);
+      updates.push({
+        id: `u_aclose_${updates.length}`,
+        grievanceId,
+        status: 'Closed',
+        remark: remark || 'Admin force-closed this grievance.',
+        updatedBy: 'Admin Command Center',
+        timestamp: now
+      });
+      setLocalStorage('js_updates', updates);
+      return true;
+    }
+    return false;
+  },
+
+  async updateGrievancePriority(grievanceId: string, newPriority: 'Critical' | 'High' | 'Medium' | 'Low'): Promise<boolean> {
+    const grievances = getLocalStorage<Grievance[]>('js_grievances', []);
+    const gIdx = grievances.findIndex(g => g.id === grievanceId);
+    if (gIdx !== -1) {
+      const now = new Date().toISOString();
+      const oldPriority = grievances[gIdx].priority;
+      grievances[gIdx].priority = newPriority;
+      grievances[gIdx].updatedAt = now;
+
+      // Recalculate SLA
+      const slaMap: Record<string, number> = { Critical: 24, High: 48, Medium: 96, Low: 168 };
+      grievances[gIdx].slaDeadline = new Date(new Date(grievances[gIdx].createdAt).getTime() + slaMap[newPriority] * 60 * 60 * 1000).toISOString();
+      setLocalStorage('js_grievances', grievances);
+
+      const updates = getLocalStorage<GrievanceUpdate[]>('js_updates', []);
+      updates.push({
+        id: `u_apri_${updates.length}`,
+        grievanceId,
+        status: grievances[gIdx].status,
+        remark: `Admin changed priority from ${oldPriority} to ${newPriority}.`,
+        updatedBy: 'Admin Command Center',
+        timestamp: now
+      });
+      setLocalStorage('js_updates', updates);
+      return true;
+    }
+    return false;
+  },
+
+  // System Settings
+  async getDepartments(): Promise<typeof MOCK_DEPARTMENTS> {
+    return getLocalStorage('js_departments', MOCK_DEPARTMENTS);
+  },
+
+  async updateDeptSLA(deptId: string, newSlaHours: number): Promise<boolean> {
+    const departments = getLocalStorage('js_departments', MOCK_DEPARTMENTS);
+    const idx = departments.findIndex((d: any) => d.id === deptId);
+    if (idx !== -1) {
+      departments[idx].slaHours = newSlaHours;
+      setLocalStorage('js_departments', departments);
+      return true;
+    }
+    return false;
+  },
+
+  async getAuditLog(): Promise<GrievanceUpdate[]> {
+    const updates = getLocalStorage<GrievanceUpdate[]>('js_updates', []);
+    return updates.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  },
+
+  async exportGrievances(): Promise<string> {
+    const grievances = getLocalStorage<Grievance[]>('js_grievances', []);
+    return JSON.stringify(grievances, null, 2);
   }
 };
