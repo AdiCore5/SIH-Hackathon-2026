@@ -800,5 +800,42 @@ export const api = {
     localStorage.removeItem('js_notifications');
     initLocalStorageData();
     return true;
+  },
+
+  // OTP Sending simulation
+  async sendOTP(phone: string): Promise<boolean> {
+    await new Promise(resolve => setTimeout(resolve, 800));
+    return true;
+  },
+
+  // OTP Verification simulation
+  async verifyOTP(phone: string, otp: string): Promise<{ success: boolean; token: string; user: User }> {
+    const online = await this.isServerOnline();
+    if (online) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: 'demo.citizen@jansetu.ai', password: 'Demo@123' })
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (otp === '1234') return data;
+        }
+      } catch (e) {
+        console.error("Backend OTP verification error, trying local fallback:", e);
+      }
+    }
+
+    const users = getLocalStorage<User[]>('js_users', MOCK_USERS);
+    const user = users.find(u => u.phone === phone);
+    if (user && otp === '1234') {
+      return {
+        success: true,
+        token: `demo-jwt-token-${user.id}`,
+        user
+      };
+    }
+    throw new Error('Invalid OTP code. Please enter 1234 to verify the demo.');
   }
 };
