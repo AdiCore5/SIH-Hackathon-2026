@@ -8,22 +8,27 @@
   }
 }
 
-/* Official Government Utility Classes */
+/* Official Government Hero Gradient & Utility Classes */
+.gov-hero-gradient {
+  background: radial-gradient(circle at 80% 20%, rgba(30, 58, 138, 0.5) 0%, rgba(15, 23, 42, 0.98) 70%),
+              linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
+}
+
 .gov-header-bg {
   background: linear-gradient(135deg, #0c2340 0%, #163a63 100%);
 }
 
 .gov-card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 2px solid #cbd5e1;
   border-radius: 1rem;
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .gov-card:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.1);
+  border-color: #94a3b8;
+  box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.15);
   transform: translateY(-2px);
 }
 
@@ -74,14 +79,14 @@
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 2px solid rgba(203, 213, 225, 0.8);
 }
 
 .glass-panel-dark {
   background: rgba(12, 35, 64, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.15);
 }
 
 /* Micro-animations */
