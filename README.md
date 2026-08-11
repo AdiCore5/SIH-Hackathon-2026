@@ -2,7 +2,9 @@
 
 **“Your Grievance. Our Bridge to Resolution.”**
 
+JanSetu-AI is an AI-powered citizen grievance lodging, classification, and real-time tracking platform designed for Indian local municipal and utility governance. It makes it incredibly easy for citizens to lodge civic complaints via text or voice, automatically categorizes them, routes them to the correct ward officer, tracks progress, and alerts administrators of SLA violations.
 
+---
 
 ## Key Features
 
@@ -137,3 +139,11 @@ The AI engine in `backend/services/ai_service.py` is fully decoupled from the ro
 
 The backend client in `backend/database.py` and frontend in `src/services/supabaseClient.ts` support dual-mode database operations:
 
+1.  Run the PostgreSQL migration scripts in the `supabase/schema.sql` inside your Supabase project SQL Editor.
+2.  Seed default complaints via `supabase/seed.sql`.
+3.  Set your environment variables in `.env` (backend) and `.env.local` (frontend):
+    ```env
+    VITE_SUPABASE_URL=https://your-project.supabase.co
+    VITE_SUPABASE_ANON_KEY=your-anon-key
+    ```
+4.  The application will automatically detect the keys, deactivate LocalStorage fallbacks, and connect to your live Supabase database!
