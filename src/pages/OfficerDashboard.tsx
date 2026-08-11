@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { translate, Language } from '../services/i18n';
 import { api } from '../services/api';
-import { Grievance, GrievanceUpdate } from '../types';
+import { Grievance } from '../types';
 import { 
-  FileText, Clock, CheckCircle, AlertTriangle, 
+  FileText, Clock, CheckCircle2, AlertTriangle, 
   Search, Filter, Eye, ChevronRight, User, MapPin, 
-  Calendar, Upload, ArrowRight, ShieldCheck, HelpCircle
+  Building2, ShieldCheck, Camera, CheckSquare, MessageSquare, AlertCircle, ArrowUpRight
 } from 'lucide-react';
 
 interface OfficerDashboardProps {
@@ -43,7 +43,6 @@ export const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ lang, depart
 
   useEffect(() => {
     fetchGrievances();
-    // Register real-time sync event
     const handleUpdate = () => fetchGrievances();
     window.addEventListener('jansetu-data-updated', handleUpdate);
     return () => window.removeEventListener('jansetu-data-updated', handleUpdate);
@@ -66,12 +65,12 @@ export const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ lang, depart
       
     const matchesSearch = searchTerm === '' || 
       g.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      g.id.toLowerCase().includes(searchTerm.toLowerCase());
+      g.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (g.citizenName && g.citizenName.toLowerCase().includes(searchTerm.toLowerCase()));
       
     return matchesPriority && matchesStatus && matchesSearch;
   });
 
-  // Open detailed popup
   const handleOpenDetail = async (id: string) => {
     try {
       const detail = await api.getGrievance(id);
@@ -84,19 +83,18 @@ export const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ lang, depart
     }
   };
 
-  // Perform workflow actions
   const handleWorkflowAction = async (newStatus: string, defaultRemark: string) => {
     if (!selectedGrievance) return;
     setActionLoading(true);
     try {
       const finalRemark = remarkText.trim() || defaultRemark;
-      const finalProof = newStatus === 'Resolved' ? (proofUrl.trim() || 'camera_proof_gotri_ streetlight.jpg') : undefined;
+      const finalProof = newStatus === 'Resolved' ? (proofUrl.trim() || 'camera_proof_gotri_repairs.jpg') : undefined;
       
       const success = await api.updateStatus(
         selectedGrievance.id,
         newStatus,
         finalRemark,
-        'Officer Amit Sharma',
+        'Officer Amit Sharma (Ward Nodal Chief)',
         finalProof
       );
       if (success) {
@@ -112,69 +110,88 @@ export const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ lang, depart
   };
 
   const getStatusBadge = (status: string) => {
-    let color = "text-slate-600 bg-slate-100 border-slate-200";
-    if (status === 'Submitted') color = "text-sky-600 bg-sky-50 border-sky-100";
-    if (status === 'AI Classified') color = "text-purple-600 bg-purple-50 border-purple-100 animate-pulse";
-    if (status === 'Assigned') color = "text-blue-600 bg-blue-50 border-blue-100";
-    if (status === 'In Progress') color = "text-orange-600 bg-orange-50 border-orange-100";
-    if (status === 'Awaiting Citizen') color = "text-amber-600 bg-amber-50 border-amber-100";
-    if (status === 'Resolved') color = "text-emerald-600 bg-emerald-50 border-emerald-100";
-    if (status === 'Closed') color = "text-slate-700 bg-slate-100 border-slate-200";
-    if (status === 'Escalated') color = "text-rose-600 bg-rose-50 border-rose-100 font-bold border";
+    let color = "text-slate-700 bg-slate-100 border-slate-300";
+    if (status === 'Submitted') color = "text-sky-700 bg-sky-50 border-sky-200";
+    if (status === 'AI Classified') color = "text-purple-700 bg-purple-50 border-purple-200 animate-pulse";
+    if (status === 'Assigned') color = "text-blue-700 bg-blue-50 border-blue-200 font-bold";
+    if (status === 'In Progress') color = "text-orange-700 bg-orange-50 border-orange-200 font-bold";
+    if (status === 'Awaiting Citizen') color = "text-amber-700 bg-amber-50 border-amber-200";
+    if (status === 'Resolved') color = "text-emerald-700 bg-emerald-50 border-emerald-200 font-bold";
+    if (status === 'Closed') color = "text-slate-700 bg-slate-100 border-slate-300";
+    if (status === 'Escalated') color = "text-rose-700 bg-rose-50 border-rose-200 font-black shadow-xs";
     
     return (
-      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide ${color}`}>
+      <span className={`px-3 py-1 rounded-full text-[11px] font-extrabold tracking-wide border ${color}`}>
         {status}
       </span>
     );
   };
 
   const getPriorityColor = (priority: string) => {
-    if (priority === 'Critical') return 'text-rose-700 bg-rose-50';
-    if (priority === 'High') return 'text-rose-600 bg-rose-50/50';
-    if (priority === 'Medium') return 'text-orange-600 bg-orange-50';
-    return 'text-green-600 bg-green-50';
+    if (priority === 'Critical') return 'text-rose-800 bg-rose-100 border-rose-300 font-black';
+    if (priority === 'High') return 'text-orange-800 bg-orange-100 border-orange-300 font-bold';
+    if (priority === 'Medium') return 'text-amber-800 bg-amber-100 border-amber-300';
+    return 'text-emerald-800 bg-emerald-100 border-emerald-300';
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 flex flex-col gap-8">
+    <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 flex flex-col gap-8 animate-slide-up">
       
-      {/* Header Info */}
-      <section className="flex justify-between items-center border-b border-slate-200 pb-4">
+      {/* Officer Command Header */}
+      <section className="bg-slate-900 text-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Municipal Officer Workspace</h2>
-          <p className="text-xs text-slate-500 mt-1">Assigned Department: <span className="font-bold text-slate-800">Municipal Corporation (Gotri Ward 12)</span></p>
+          <div className="flex items-center gap-2 text-xs font-bold text-orange-400 uppercase tracking-wider mb-1">
+            <Building2 size={16} />
+            <span>Gotri Ward 12 Municipal Nodal Office</span>
+          </div>
+          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+            Officer Operational Command Desk
+          </h2>
+          <p className="text-xs text-slate-400 mt-1">
+            Assigned Nodal Officer: <strong className="text-white">Officer Amit Sharma (Badge: IND-MUNI-884)</strong>
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 bg-slate-800/80 p-3 rounded-2xl border border-slate-700 text-xs shrink-0">
+          <div className="h-3 w-3 bg-emerald-500 rounded-full animate-ping"></div>
+          <div>
+            <span className="text-[10px] text-slate-400 font-bold uppercase block">AI System Status</span>
+            <span className="font-extrabold text-emerald-400">Auto-Routing & SLA Tracker Active</span>
+          </div>
         </div>
       </section>
 
-      {/* Stats Counters Grid */}
+      {/* Metrics Cards Grid */}
       <section className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <div className="gov-card p-5 border-l-4 border-l-slate-700">
           <span className="text-[10px] uppercase font-bold text-slate-400">Total Assigned</span>
-          <p className="text-2xl font-black text-slate-900 mt-2 leading-none">{total}</p>
+          <p className="text-3xl font-black text-slate-900 mt-1 leading-none">{total}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <span className="text-[10px] uppercase font-bold text-slate-400">Pending</span>
-          <p className="text-2xl font-black text-amber-500 mt-2 leading-none">{pending}</p>
+        <div className="gov-card p-5 border-l-4 border-l-amber-500">
+          <span className="text-[10px] uppercase font-bold text-amber-600">Pending Acceptance</span>
+          <p className="text-3xl font-black text-slate-900 mt-1 leading-none">{pending}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <span className="text-[10px] uppercase font-bold text-slate-400">In Progress</span>
-          <p className="text-2xl font-black text-orange-500 mt-2 leading-none">{inProgress}</p>
+        <div className="gov-card p-5 border-l-4 border-l-orange-500">
+          <span className="text-[10px] uppercase font-bold text-orange-600">Active In Field</span>
+          <p className="text-3xl font-black text-slate-900 mt-1 leading-none">{inProgress}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <span className="text-[10px] uppercase font-bold text-slate-400">Resolved</span>
-          <p className="text-2xl font-black text-emerald-500 mt-2 leading-none">{resolved}</p>
+        <div className="gov-card p-5 border-l-4 border-l-emerald-500">
+          <span className="text-[10px] uppercase font-bold text-emerald-600">Resolved & Closed</span>
+          <p className="text-3xl font-black text-slate-900 mt-1 leading-none">{resolved}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <span className="text-[10px] uppercase font-bold text-slate-400">SLA Breached</span>
-          <p className="text-2xl font-black text-rose-500 mt-2 leading-none">{breached}</p>
+        <div className="gov-card p-5 border-l-4 border-l-rose-500">
+          <span className="text-[10px] uppercase font-bold text-rose-600">SLA Breached / Risk</span>
+          <p className="text-3xl font-black text-rose-600 mt-1 leading-none">{breached}</p>
         </div>
       </section>
 
-      {/* Main Grid table */}
-      <section className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
+      {/* Main Action Queue Table */}
+      <section className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4">
-          <h3 className="font-bold text-slate-900 text-base">Assigned Civic Grievances</h3>
+          <div>
+            <h3 className="font-extrabold text-slate-900 text-lg">Assigned Public Complaints Queue</h3>
+            <p className="text-xs text-slate-500">Review AI classification, accept field tasks, and upload verification proof.</p>
+          </div>
           
           <div className="flex flex-wrap items-center gap-3">
             {/* Search Input */}
@@ -183,36 +200,33 @@ export const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ lang, depart
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search ID, keyword..."
-                className="rounded-lg border border-slate-200 pl-8 pr-3 py-1.5 text-xs text-slate-700 focus:border-orange-500 focus:outline-none"
+                placeholder="Search ID, title, citizen..."
+                className="rounded-xl border border-slate-200 pl-8 pr-3 py-1.5 text-xs text-slate-700 focus:border-orange-500 focus:outline-none w-48 shadow-xs"
               />
               <Search className="absolute left-2.5 top-2 text-slate-400" size={14} />
             </div>
 
             {/* Priority filter */}
-            <div className="flex items-center gap-1">
-              <Filter size={12} className="text-slate-400" />
-              <select
-                value={filterPriority}
-                onChange={(e) => setFilterPriority(e.target.value)}
-                className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-600 focus:outline-none"
-              >
-                <option value="all">All Priorities</option>
-                <option value="Critical">Critical</option>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
-            </div>
+            <select
+              value={filterPriority}
+              onChange={(e) => setFilterPriority(e.target.value)}
+              className="rounded-xl border border-slate-200 px-3 py-1.5 text-xs text-slate-700 font-bold focus:outline-none shadow-xs"
+            >
+              <option value="all">All Priorities</option>
+              <option value="Critical">Critical</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
 
             {/* Status Filter */}
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-600 focus:outline-none"
+              className="rounded-xl border border-slate-200 px-3 py-1.5 text-xs text-slate-700 font-bold focus:outline-none shadow-xs"
             >
               <option value="all">All Status</option>
-              <option value="pending">Pending</option>
+              <option value="pending">Pending Action</option>
               <option value="progress">In Progress</option>
               <option value="resolved">Resolved</option>
               <option value="escalated">Escalated</option>
@@ -221,45 +235,48 @@ export const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ lang, depart
         </div>
 
         {loading ? (
-          <div className="p-8 text-center text-xs text-slate-400 font-medium">Fetching assigned complaints...</div>
+          <div className="p-12 text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-3">
+            <div className="h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <span>Syncing command queue with central database...</span>
+          </div>
         ) : filteredGrievances.length === 0 ? (
-          <div className="p-8 text-center text-xs text-slate-400 font-medium">No grievances matching current filters.</div>
+          <div className="p-12 text-center text-xs text-slate-400 font-medium">No grievances matching current filters.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-200/80 text-[10px] uppercase font-bold text-slate-400 bg-slate-50/50">
-                  <th className="py-3 px-4">ID</th>
-                  <th className="py-3 px-4">Citizen</th>
-                  <th className="py-3 px-4">Complaint Title</th>
-                  <th className="py-3 px-4">Priority</th>
-                  <th className="py-3 px-4">Date Filed</th>
-                  <th className="py-3 px-4">SLA Deadline</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Action</th>
+                <tr className="border-b border-slate-200 text-[10px] uppercase font-bold text-slate-400 bg-slate-50/80">
+                  <th className="py-3.5 px-4">Grievance ID</th>
+                  <th className="py-3.5 px-4">Complainant</th>
+                  <th className="py-3.5 px-4">Issue Description</th>
+                  <th className="py-3.5 px-4">Priority Tag</th>
+                  <th className="py-3.5 px-4">Filing Date</th>
+                  <th className="py-3.5 px-4">SLA Target</th>
+                  <th className="py-3.5 px-4">Current Status</th>
+                  <th className="py-3.5 px-4 text-right">Inspect & Act</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredGrievances.map(g => (
-                  <tr key={g.id} className="border-b border-slate-100 hover:bg-slate-50/80 transition-all font-medium">
-                    <td className="py-3.5 px-4 font-extrabold text-slate-900">{g.id}</td>
-                    <td className="py-3.5 px-4 text-slate-700">{g.citizenName || 'Rahul Verma'}</td>
-                    <td className="py-3.5 px-4 text-slate-600 max-w-[180px] truncate">{g.title}</td>
-                    <td className="py-3.5 px-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${getPriorityColor(g.priority)}`}>
+                  <tr key={g.id} className="border-b border-slate-100 hover:bg-slate-50 transition-all font-medium">
+                    <td className="py-4 px-4 font-mono font-extrabold text-slate-900">{g.id}</td>
+                    <td className="py-4 px-4 font-bold text-slate-800">{g.citizenName || 'Rahul Verma'}</td>
+                    <td className="py-4 px-4 text-slate-600 max-w-[200px] truncate">{g.title}</td>
+                    <td className="py-4 px-4">
+                      <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold border ${getPriorityColor(g.priority)}`}>
                         {g.priority}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-400">{new Date(g.createdAt).toLocaleDateString()}</td>
-                    <td className="py-3.5 px-4 text-slate-500 font-semibold">{new Date(g.slaDeadline).toLocaleDateString()}</td>
-                    <td className="py-3.5 px-4">{getStatusBadge(g.status)}</td>
-                    <td className="py-3.5 px-4 text-right">
+                    <td className="py-4 px-4 text-slate-400">{new Date(g.createdAt).toLocaleDateString()}</td>
+                    <td className="py-4 px-4 text-slate-700 font-bold">{new Date(g.slaDeadline).toLocaleDateString()}</td>
+                    <td className="py-4 px-4">{getStatusBadge(g.status)}</td>
+                    <td className="py-4 px-4 text-right">
                       <button
                         onClick={() => handleOpenDetail(g.id)}
-                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 hover-lift"
+                        className="bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-3.5 py-1.5 rounded-xl inline-flex items-center gap-1 hover-lift text-xs shadow-xs"
                       >
-                        <Eye size={12} />
-                        Details
+                        <Eye size={14} />
+                        <span>Action Desk</span>
                       </button>
                     </td>
                   </tr>
@@ -272,12 +289,12 @@ export const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ lang, depart
 
       {/* COMPLAINT DETAIL & WORKFLOW ACTIONS MODAL */}
       {showDetailModal && selectedGrievance && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-lg max-h-[90vh] overflow-y-auto success-pop flex flex-col gap-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto success-pop flex flex-col gap-6">
             
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <h4 className="font-extrabold text-slate-900 text-lg">Grievance {selectedGrievance.id}</h4>
+                <h4 className="font-extrabold text-slate-900 text-lg">Official Review: {selectedGrievance.id}</h4>
                 {getStatusBadge(selectedGrievance.status)}
               </div>
               <button 
@@ -291,134 +308,124 @@ export const OfficerDashboard: React.FC<OfficerDashboardProps> = ({ lang, depart
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
               <div className="space-y-4">
                 <div>
-                  <span className="text-[9px] uppercase font-bold text-slate-400">Citizen name</span>
+                  <span className="text-[9px] uppercase font-bold text-slate-400">Citizen Info</span>
                   <p className="font-bold text-slate-800">{selectedGrievance.citizenName || 'Rahul Verma'}</p>
                 </div>
                 <div>
-                  <span className="text-[9px] uppercase font-bold text-slate-400">Location Address</span>
+                  <span className="text-[9px] uppercase font-bold text-slate-400">Incident Location</span>
                   <p className="text-slate-700">{selectedGrievance.location.address || `${selectedGrievance.location.city}, ${selectedGrievance.location.ward}`}</p>
                 </div>
                 <div>
-                  <span className="text-[9px] uppercase font-bold text-slate-400">Description</span>
-                  <p className="text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">{selectedGrievance.description}</p>
+                  <span className="text-[9px] uppercase font-bold text-slate-400">Grievance Full Text</span>
+                  <p className="text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200">{selectedGrievance.description}</p>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <div className="bg-orange-50/50 border border-orange-200/50 p-4 rounded-2xl flex flex-col gap-2">
-                  <span className="text-[10px] font-bold text-orange-600 flex items-center gap-1">
+                <div className="bg-indigo-50/70 border border-indigo-200 p-4 rounded-2xl flex flex-col gap-2">
+                  <span className="text-[10px] font-bold text-indigo-700 flex items-center gap-1">
                     <ShieldCheck size={14} />
-                    JanSetu AI Analysis
+                    JanSetu AI Auto-Classification Engine
                   </span>
                   <div>
-                    <span className="text-[8px] uppercase font-bold text-slate-400">AI Summary</span>
+                    <span className="text-[8px] uppercase font-bold text-slate-400">Extracted Summary</span>
                     <p className="text-[11px] italic text-slate-700 leading-relaxed mt-0.5">"{selectedGrievance.aiSummary}"</p>
                   </div>
                   <div className="grid grid-cols-2 gap-2 mt-1.5 text-[10px]">
                     <div>
                       <span className="text-[8px] text-slate-400 uppercase block">Priority</span>
-                      <span className="font-bold text-slate-800">{selectedGrievance.priority}</span>
+                      <span className="font-extrabold text-slate-800">{selectedGrievance.priority}</span>
                     </div>
                     <div>
-                      <span className="text-[8px] text-slate-400 uppercase block">Confidence</span>
-                      <span className="font-bold text-slate-800">{selectedGrievance.aiConfidence}%</span>
+                      <span className="text-[8px] text-slate-400 uppercase block">AI Confidence</span>
+                      <span className="font-extrabold text-slate-800">{selectedGrievance.aiConfidence}%</span>
                     </div>
                   </div>
                 </div>
-
-                {selectedGrievance.evidenceUrls && selectedGrievance.evidenceUrls.length > 0 && (
-                  <div>
-                    <span className="text-[9px] uppercase font-bold text-slate-400">Attachments</span>
-                    <div className="flex gap-2 mt-1.5">
-                      {selectedGrievance.evidenceUrls.map((file: string, idx: number) => (
-                        <div key={idx} className="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg font-bold text-[10px] text-slate-600 flex items-center gap-1">
-                          📎 {file}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
             {/* Workflow Actions Input Block */}
-            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex flex-col gap-4">
-              <h5 className="font-bold text-slate-900 text-xs">Update Status / Add Remark</h5>
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col gap-4">
+              <h5 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider">Update Status & Official Notes</h5>
               
               <div>
-                <span className="text-[9px] text-slate-400 font-bold block mb-1">Add Remark / Log updates</span>
+                <span className="text-[10px] text-slate-500 font-bold block mb-1">Official Nodal Remark</span>
                 <textarea
                   value={remarkText}
                   onChange={(e) => setRemarkText(e.target.value)}
-                  placeholder="Describe details of work done, investigation progress..."
+                  placeholder="Enter details of field inspection, repair status..."
                   rows={2}
-                  className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:border-indigo-600"
+                  className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs text-slate-800 focus:border-blue-600 focus:outline-none"
                 />
               </div>
 
-              {/* Resolution proof uploader placeholder (only visible if updating to Resolved) */}
+              {/* Resolution proof uploader */}
               {selectedGrievance.status === 'In Progress' && (
-                <div className="bg-white border border-slate-200 p-3.5 rounded-xl flex justify-between items-center gap-4">
+                <div className="bg-white border border-slate-200 p-3.5 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                   <div className="text-xs">
-                    <p className="font-bold text-slate-800">Resolution Proof Upload</p>
-                    <p className="text-[10px] text-slate-400">Required to mark complaint resolved.</p>
+                    <p className="font-bold text-slate-800 flex items-center gap-1">
+                      <Camera size={14} className="text-emerald-600" />
+                      Upload On-Site Photo Verification Proof
+                    </p>
+                    <p className="text-[10px] text-slate-400">Required by GIGW auditing guidelines before closing.</p>
                   </div>
                   <input
                     type="text"
                     value={proofUrl}
                     onChange={(e) => setProofUrl(e.target.value)}
-                    placeholder="e.g. proof_streetlight_replaced.jpg"
-                    className="border border-slate-200 rounded px-2.5 py-1 text-xs text-slate-800 focus:border-indigo-600"
+                    placeholder="e.g. photo_proof_repaired.jpg"
+                    className="border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-800 focus:border-blue-600 w-full sm:w-auto"
                   />
                 </div>
               )}
 
               {/* Action Buttons Panel */}
-              <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-200/60">
+              <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-200">
                 {selectedGrievance.status === 'Assigned' && (
                   <button
-                    onClick={() => handleWorkflowAction('In Progress', 'Officer accepted the grievance and marked In Progress')}
+                    onClick={() => handleWorkflowAction('In Progress', 'Nodal Officer accepted the grievance for field inspection.')}
                     disabled={actionLoading}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-sm"
                   >
-                    Accept & Mark In Progress
+                    Accept & Begin Inspection
                   </button>
                 )}
 
                 {selectedGrievance.status === 'In Progress' && (
                   <>
                     <button
-                      onClick={() => handleWorkflowAction('Resolved', 'Officer completed the maintenance repair.')}
+                      onClick={() => handleWorkflowAction('Resolved', 'Nodal Officer verified repair on-site and attached photo proof.')}
                       disabled={actionLoading}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-sm"
                     >
-                      Mark Resolved
+                      ✓ Mark Resolved & Upload Proof
                     </button>
                     <button
-                      onClick={() => handleWorkflowAction('Awaiting Citizen', 'Requesting additional information from citizen regarding location')}
+                      onClick={() => handleWorkflowAction('Awaiting Citizen', 'Nodal officer requested additional location details from complainant.')}
                       disabled={actionLoading}
-                      className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5"
+                      className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5"
                     >
-                      Request Info
+                      Request Info from Citizen
                     </button>
                   </>
                 )}
 
                 <button
-                  onClick={() => handleWorkflowAction(selectedGrievance.status, 'Remark update logged')}
+                  onClick={() => handleWorkflowAction(selectedGrievance.status, 'Nodal remark updated.')}
                   disabled={actionLoading || !remarkText.trim()}
-                  className="bg-slate-800 hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-xl text-xs disabled:opacity-50"
+                  className="bg-slate-800 hover:bg-slate-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs disabled:opacity-50"
                 >
-                  Add Remark Only
+                  Save Remark Only
                 </button>
                 
                 {selectedGrievance.status !== 'Escalated' && (
                   <button
-                    onClick={() => handleWorkflowAction('Escalated', 'Manual officer escalation to division chief.')}
+                    onClick={() => handleWorkflowAction('Escalated', 'Nodal officer escalated issue due to high complexity / budget approval requirement.')}
                     disabled={actionLoading}
-                    className="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-xl text-xs ml-auto"
+                    className="bg-rose-600 hover:bg-rose-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs ml-auto shadow-sm"
                   >
-                    Escalate
+                    Escalate to State Chief
                   </button>
                 )}
               </div>

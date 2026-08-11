@@ -3,8 +3,8 @@ import { translate, Language } from '../services/i18n';
 import { api } from '../services/api';
 import { Grievance } from '../types';
 import { 
-  FileText, Clock, CheckCircle, AlertTriangle, 
-  Calendar, Search, Filter, ArrowRight 
+  FileText, Clock, CheckCircle2, AlertTriangle, 
+  Search, Filter, ArrowRight, ShieldCheck, User, Star, MapPin, Building2, ChevronRight
 } from 'lucide-react';
 
 interface CitizenDashboardProps {
@@ -18,12 +18,12 @@ export const CitizenDashboard: React.FC<CitizenDashboardProps> = ({ lang, onNavi
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
   const fetchGrievances = async () => {
     setLoading(true);
     try {
       const data = await api.getGrievances();
-      // Filter only grievances for this citizen
       const userG = data.filter(g => g.citizenId === userId);
       setGrievances(userG);
     } catch (e) {
@@ -35,13 +35,12 @@ export const CitizenDashboard: React.FC<CitizenDashboardProps> = ({ lang, onNavi
 
   useEffect(() => {
     fetchGrievances();
-    // Setup local event listener for real-time reactivity
     const handleUpdate = () => fetchGrievances();
     window.addEventListener('jansetu-data-updated', handleUpdate);
     return () => window.removeEventListener('jansetu-data-updated', handleUpdate);
   }, [userId]);
 
-  // Status counters
+  // Status metrics
   const total = grievances.length;
   const inProgress = grievances.filter(g => ['Assigned', 'In Progress', 'Awaiting Citizen'].includes(g.status)).length;
   const resolved = grievances.filter(g => ['Resolved', 'Closed'].includes(g.status)).length;
@@ -56,160 +55,263 @@ export const CitizenDashboard: React.FC<CitizenDashboardProps> = ({ lang, onNavi
       
     const matchesSearch = searchTerm === '' || 
       g.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      g.id.toLowerCase().includes(searchTerm.toLowerCase());
+      g.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      g.category.toLowerCase().includes(searchTerm.toLowerCase());
       
     return matchesStatus && matchesSearch;
   });
 
   const getStatusBadge = (status: string) => {
-    let color = "text-slate-600 bg-slate-100 border-slate-200";
-    if (status === 'Submitted') color = "text-sky-600 bg-sky-50 border-sky-100";
-    if (status === 'AI Classified') color = "text-purple-600 bg-purple-50 border-purple-100 animate-pulse";
-    if (status === 'Assigned') color = "text-blue-600 bg-blue-50 border-blue-100";
-    if (status === 'In Progress') color = "text-orange-600 bg-orange-50 border-orange-100";
-    if (status === 'Awaiting Citizen') color = "text-amber-600 bg-amber-50 border-amber-100";
-    if (status === 'Resolved') color = "text-emerald-600 bg-emerald-50 border-emerald-100";
-    if (status === 'Closed') color = "text-slate-700 bg-slate-100 border-slate-200";
-    if (status === 'Escalated') color = "text-rose-600 bg-rose-50 border-rose-100 font-bold border";
+    let color = "text-slate-700 bg-slate-100 border-slate-300";
+    if (status === 'Submitted') color = "text-sky-700 bg-sky-50 border-sky-200";
+    if (status === 'AI Classified') color = "text-purple-700 bg-purple-50 border-purple-200 animate-pulse";
+    if (status === 'Assigned') color = "text-blue-700 bg-blue-50 border-blue-200 font-bold";
+    if (status === 'In Progress') color = "text-orange-700 bg-orange-50 border-orange-200 font-bold";
+    if (status === 'Awaiting Citizen') color = "text-amber-700 bg-amber-50 border-amber-200";
+    if (status === 'Resolved') color = "text-emerald-700 bg-emerald-50 border-emerald-200 font-bold";
+    if (status === 'Closed') color = "text-slate-700 bg-slate-100 border-slate-300";
+    if (status === 'Escalated') color = "text-rose-700 bg-rose-50 border-rose-200 font-black shadow-xs";
     
     return (
-      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide ${color}`}>
+      <span className={`px-3 py-1 rounded-full text-[11px] font-extrabold tracking-wide border ${color}`}>
         {status}
       </span>
     );
   };
 
-  const getPriorityColor = (priority: string) => {
-    if (priority === 'Critical') return 'text-rose-700 bg-rose-50';
-    if (priority === 'High') return 'text-rose-600 bg-rose-50/50';
-    if (priority === 'Medium') return 'text-orange-600 bg-orange-50';
-    return 'text-green-600 bg-green-50';
+  const getPriorityBadge = (priority: string) => {
+    if (priority === 'Critical') return 'bg-rose-100 text-rose-800 border-rose-300 font-black';
+    if (priority === 'High') return 'bg-orange-100 text-orange-800 border-orange-300 font-bold';
+    if (priority === 'Medium') return 'bg-amber-100 text-amber-800 border-amber-300';
+    return 'bg-emerald-100 text-emerald-800 border-emerald-300';
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 flex flex-col gap-8">
+    <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 flex flex-col gap-8 animate-slide-up">
       
-      {/* Header Greeting */}
-      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-1.5">
-            Good morning, Rahul 👋
-          </h2>
-          <p className="text-xs text-slate-500 mt-1">Here is a summary of your active civic grievances and trackings.</p>
-        </div>
-        <button
-          onClick={() => onNavigate('lodge')}
-          className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-premium hover-lift w-fit"
-        >
-          + Lodge a Grievance
-        </button>
-      </section>
-
-      {/* Grid Status Metrics Cards */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Official Citizen Welcome Banner */}
+      <section className="bg-slate-900 text-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-800 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
         
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-[10px] uppercase font-bold text-slate-400">Total Filed</span>
-            <FileText size={16} className="text-slate-400" />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 bg-orange-600/20 border-2 border-orange-500 rounded-2xl flex items-center justify-center text-orange-400 font-black text-2xl shadow-lg shrink-0">
+              <User size={32} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Rahul Verma</h2>
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                  <ShieldCheck size={12} /> Verified Aadhaar
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-1 flex items-center gap-2">
+                <span>Aadhaar Virtual ID: •••• •••• 9812</span>
+                <span className="text-slate-600">•</span>
+                <span>District: Vadodara Urban</span>
+              </p>
+            </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 leading-none">{total}</p>
-        </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-[10px] uppercase font-bold text-slate-400">In Progress</span>
-            <Clock size={16} className="text-orange-400" />
-          </div>
-          <p className="text-2xl font-black text-slate-900 leading-none">{inProgress}</p>
+          <button
+            onClick={() => onNavigate('lodge')}
+            className="bg-orange-600 hover:bg-orange-500 text-white text-xs font-extrabold px-6 py-3.5 rounded-2xl shadow-xl hover-lift flex items-center gap-2 border border-orange-400/30 shrink-0"
+          >
+            <span>📝 Lodge New Grievance</span>
+            <ArrowRight size={16} />
+          </button>
         </div>
-
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-[10px] uppercase font-bold text-slate-400">Resolved</span>
-            <CheckCircle size={16} className="text-emerald-500" />
-          </div>
-          <p className="text-2xl font-black text-slate-900 leading-none">{resolved}</p>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-[10px] uppercase font-bold text-slate-400">Escalated</span>
-            <AlertTriangle size={16} className="text-rose-500" />
-          </div>
-          <p className="text-2xl font-black text-slate-900 leading-none">{escalated}</p>
-        </div>
-
       </section>
 
-      {/* Recent Grievances filter section */}
-      <section className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col gap-6">
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4">
-          <h3 className="font-bold text-slate-900 text-base">Recent Grievances</h3>
-          
+      {/* Metric Counters Cards */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="gov-card p-5 border-l-4 border-l-slate-700">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-[10px] uppercase font-bold text-slate-400">Total Registered</span>
+            <FileText size={18} className="text-slate-400" />
+          </div>
+          <p className="text-3xl font-black text-slate-900 leading-none">{total}</p>
+          <span className="text-[10px] text-slate-400 mt-2 block">CPGRAMS Synced</span>
+        </div>
+
+        <div className="gov-card p-5 border-l-4 border-l-orange-500">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-[10px] uppercase font-bold text-orange-600">In Active Redressal</span>
+            <Clock size={18} className="text-orange-500 animate-pulse" />
+          </div>
+          <p className="text-3xl font-black text-slate-900 leading-none">{inProgress}</p>
+          <span className="text-[10px] text-orange-600 font-semibold mt-2 block">Assigned to Ward Nodal Officer</span>
+        </div>
+
+        <div className="gov-card p-5 border-l-4 border-l-emerald-500">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-[10px] uppercase font-bold text-emerald-600">Resolved & Verified</span>
+            <CheckCircle2 size={18} className="text-emerald-500" />
+          </div>
+          <p className="text-3xl font-black text-slate-900 leading-none">{resolved}</p>
+          <span className="text-[10px] text-emerald-600 font-semibold mt-2 block">Photo Proof Uploaded</span>
+        </div>
+
+        <div className="gov-card p-5 border-l-4 border-l-rose-500">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-[10px] uppercase font-bold text-rose-600">SLA Escalated</span>
+            <AlertTriangle size={18} className="text-rose-500" />
+          </div>
+          <p className="text-3xl font-black text-slate-900 leading-none">{escalated}</p>
+          <span className="text-[10px] text-rose-600 font-semibold mt-2 block">High-Level Nodal Attention</span>
+        </div>
+      </section>
+
+      {/* Main Complaints Section */}
+      <section className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md flex flex-col gap-6">
+        
+        {/* Controls Toolbar */}
+        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b border-slate-100 pb-5">
+          <div>
+            <h3 className="font-extrabold text-slate-900 text-lg">My Grievances & Redressal Records</h3>
+            <p className="text-xs text-slate-500">Track real-time status updates and department field inspection records.</p>
+          </div>
+
           <div className="flex flex-wrap items-center gap-3">
+            {/* Filter Tabs */}
+            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
+              <button 
+                onClick={() => setFilterStatus('all')}
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${filterStatus === 'all' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+              >
+                All ({total})
+              </button>
+              <button 
+                onClick={() => setFilterStatus('progress')}
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${filterStatus === 'progress' ? 'bg-orange-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+              >
+                In Progress ({inProgress})
+              </button>
+              <button 
+                onClick={() => setFilterStatus('resolved')}
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${filterStatus === 'resolved' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+              >
+                Resolved ({resolved})
+              </button>
+            </div>
+
             {/* Search Input */}
             <div className="relative">
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search by ID or title..."
-                className="rounded-lg border border-slate-200 pl-8 pr-3 py-1.5 text-xs text-slate-700 focus:border-orange-500 focus:outline-none"
+                placeholder="Search complaint ID..."
+                className="rounded-xl border border-slate-200 pl-8 pr-3 py-1.5 text-xs text-slate-700 focus:border-orange-500 focus:outline-none w-48 shadow-xs"
               />
               <Search className="absolute left-2.5 top-2 text-slate-400" size={14} />
             </div>
 
-            {/* Filter Selector */}
-            <div className="flex items-center gap-2">
-              <Filter size={14} className="text-slate-400" />
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs text-slate-600 focus:border-orange-500 focus:outline-none"
+            {/* View Mode Toggle */}
+            <div className="hidden sm:flex border border-slate-200 rounded-xl p-0.5 bg-slate-50">
+              <button 
+                onClick={() => setViewMode('cards')} 
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold ${viewMode === 'cards' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'}`}
               >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="progress">In Progress</option>
-                <option value="resolved">Resolved</option>
-                <option value="escalated">Escalated</option>
-              </select>
+                Cards
+              </button>
+              <button 
+                onClick={() => setViewMode('table')} 
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold ${viewMode === 'table' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'}`}
+              >
+                Table
+              </button>
             </div>
           </div>
         </div>
 
+        {/* Complaints Listing */}
         {loading ? (
-          <div className="p-8 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-            <Loader2 className="animate-spin text-slate-400" size={16} />
-            <span>Fetching grievances...</span>
+          <div className="p-12 text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-3">
+            <div className="h-8 w-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+            <span>Fetching live grievance records from NIC server...</span>
           </div>
         ) : filteredGrievances.length === 0 ? (
-          <div className="p-8 text-center text-xs text-slate-400 font-medium">
-            No grievances found matching the filters.
+          <div className="p-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+            <FileText size={36} className="text-slate-300" />
+            <p className="text-sm font-bold text-slate-600">No grievances match the selected criteria.</p>
+            <p className="text-xs text-slate-400">Click "Lodge New Grievance" above to file a new public issue.</p>
+          </div>
+        ) : viewMode === 'cards' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {filteredGrievances.map(g => (
+              <div 
+                key={g.id}
+                className="border border-slate-200 rounded-2xl p-5 hover:shadow-lg transition-all bg-white flex flex-col justify-between gap-4 hover:border-orange-300"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="font-mono text-xs font-black bg-slate-100 text-slate-900 px-2.5 py-1 rounded-md border border-slate-200">
+                      {g.id}
+                    </span>
+                    {getStatusBadge(g.status)}
+                  </div>
+
+                  <h4 className="font-extrabold text-slate-900 text-base leading-snug mb-1">
+                    {g.title}
+                  </h4>
+                  <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-3">
+                    {g.description}
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500 font-medium">
+                    <span className="flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                      <Building2 size={12} className="text-orange-500" />
+                      {g.category}
+                    </span>
+                    <span className="flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                      <MapPin size={12} className="text-slate-400" />
+                      {g.location.ward || g.location.city}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded border text-[10px] font-bold ${getPriorityBadge(g.priority)}`}>
+                      Priority: {g.priority}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <span className="text-slate-400 text-[11px]">
+                    Filed on {new Date(g.createdAt).toLocaleDateString()}
+                  </span>
+                  <button
+                    onClick={() => onNavigate('track', g.id)}
+                    className="bg-orange-50 hover:bg-orange-100 text-orange-600 px-3.5 py-1.5 rounded-xl font-extrabold flex items-center gap-1.5 transition-colors border border-orange-200"
+                  >
+                    <span>Track Live Status</span>
+                    <ChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-200/80 text-[10px] uppercase font-bold text-slate-400 bg-slate-50/50">
-                  <th className="py-3 px-4">{translate('tbl_id', lang)}</th>
-                  <th className="py-3 px-4">{translate('tbl_subject', lang)}</th>
-                  <th className="py-3 px-4">{translate('tbl_dept', lang)}</th>
-                  <th className="py-3 px-4">{translate('tbl_date', lang)}</th>
-                  <th className="py-3 px-4">{translate('tbl_priority', lang)}</th>
-                  <th className="py-3 px-4">{translate('tbl_status', lang)}</th>
-                  <th className="py-3 px-4 text-right">{translate('tbl_action', lang)}</th>
+                <tr className="border-b border-slate-200 text-[10px] uppercase font-bold text-slate-400 bg-slate-50/80">
+                  <th className="py-3 px-4">Grievance Token</th>
+                  <th className="py-3 px-4">Subject Title</th>
+                  <th className="py-3 px-4">Department</th>
+                  <th className="py-3 px-4">Filing Date</th>
+                  <th className="py-3 px-4">Priority</th>
+                  <th className="py-3 px-4">Current Status</th>
+                  <th className="py-3 px-4 text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredGrievances.map(g => (
-                  <tr key={g.id} className="border-b border-slate-100 hover:bg-slate-50/80 transition-all font-medium">
-                    <td className="py-3.5 px-4 font-extrabold text-slate-900">{g.id}</td>
-                    <td className="py-3.5 px-4 text-slate-700 max-w-[200px] truncate">{g.title}</td>
-                    <td className="py-3.5 px-4 text-slate-500">{g.category}</td>
+                  <tr key={g.id} className="border-b border-slate-100 hover:bg-slate-50 transition-all">
+                    <td className="py-3.5 px-4 font-mono font-extrabold text-slate-900">{g.id}</td>
+                    <td className="py-3.5 px-4 font-bold text-slate-800 max-w-[220px] truncate">{g.title}</td>
+                    <td className="py-3.5 px-4 text-slate-600">{g.category}</td>
                     <td className="py-3.5 px-4 text-slate-400">{new Date(g.createdAt).toLocaleDateString()}</td>
                     <td className="py-3.5 px-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${getPriorityColor(g.priority)}`}>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getPriorityBadge(g.priority)}`}>
                         {g.priority}
                       </span>
                     </td>
@@ -217,9 +319,9 @@ export const CitizenDashboard: React.FC<CitizenDashboardProps> = ({ lang, onNavi
                     <td className="py-3.5 px-4 text-right">
                       <button
                         onClick={() => onNavigate('track', g.id)}
-                        className="text-xs text-orange-500 hover:text-orange-600 font-bold inline-flex items-center gap-1.5"
+                        className="text-xs text-orange-600 hover:text-orange-700 font-extrabold inline-flex items-center gap-1 bg-orange-50 px-3 py-1 rounded-lg border border-orange-200"
                       >
-                        Track Status
+                        <span>Track</span>
                         <ArrowRight size={12} />
                       </button>
                     </td>
@@ -230,15 +332,7 @@ export const CitizenDashboard: React.FC<CitizenDashboardProps> = ({ lang, onNavi
           </div>
         )}
       </section>
-      
+
     </div>
   );
 };
-
-// Loader helper inside dashboard
-const Loader2: React.FC<any> = ({ className, size }) => (
-  <svg className={`animate-spin ${className}`} style={{ width: size, height: size }} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-  </svg>
-);
