@@ -68,10 +68,7 @@ Smart Dispatcher Routing (Officer assignment in target Ward)
 *   Node.js (v18+)
 *   Python (v3.10+)
 
-### 1. Run Backend FastAPI Server
-1. Navigate to the `backend` directory:
-   ```bash
-   cd backend
+### 
    ```
 2. Create and activate a Python virtual environment:
    *   **Windows**:

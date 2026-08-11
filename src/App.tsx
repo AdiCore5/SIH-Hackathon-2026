@@ -15,11 +15,14 @@ import { TrackGrievance } from './pages/TrackGrievance';
 import { CitizenDashboard } from './pages/CitizenDashboard';
 import { OfficerDashboard } from './pages/OfficerDashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { AdminManageOfficers } from './pages/AdminManageOfficers';
+import { AdminManageGrievances } from './pages/AdminManageGrievances';
+import { AdminSystemSettings } from './pages/AdminSystemSettings';
 
-import { Key, Landmark, ShieldCheck, UserCheck, Volume2, Sparkles, CheckCircle2, Globe, Shield, ArrowRight, Activity, Building2 } from 'lucide-react';
+import { Key, Landmark, Lock, ShieldCheck, UserCheck, Volume2, Sparkles, CheckCircle2, Globe, Shield, ArrowRight, Activity, Building2 } from 'lucide-react';
 
 const App: React.FC = () => {
-  // Auth state (Default false for realistic login screen preview, 1-click bypass available)
+  // Auth state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState('demo.citizen@jansetu.ai');
   const [password, setPassword] = useState('Demo@123');
@@ -38,10 +41,15 @@ const App: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [userName, setUserName] = useState('Rahul Verma');
 
+  // Auth tabs & form state
+  const [loginTab, setLoginTab] = useState<'phone' | 'email' | 'admin'>('phone');
   const [phone, setPhone] = useState('9876543210');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
+  const [adminAccessCode, setAdminAccessCode] = useState('ADMIN-2026');
+  const [adminEmail, setAdminEmail] = useState('demo.admin@jansetu.ai');
+  const [adminPassword, setAdminPassword] = useState('Demo@123');
 
   const playVoiceGuide = () => {
     if ('speechSynthesis' in window) {
@@ -91,6 +99,36 @@ const App: React.FC = () => {
       handleRoleChange(response.user.role as UserRole);
     } catch (err: any) {
       setAuthError(err.message || "Invalid OTP code. Please enter 1234.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      const response = await api.login(email, password);
+      setIsLoggedIn(true);
+      handleRoleChange(response.user.role as UserRole);
+    } catch (e: any) {
+      setAuthError(e.message || "Failed to log in.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleAdminLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      const response = await api.adminLogin(adminEmail, adminPassword, adminAccessCode);
+      setIsLoggedIn(true);
+      handleRoleChange(response.user.role as UserRole);
+    } catch (e: any) {
+      setAuthError(e.message || 'Admin authentication failed.');
     } finally {
       setAuthLoading(false);
     }
@@ -282,7 +320,7 @@ const App: React.FC = () => {
                       <Landmark className="text-orange-500" size={20} />
                       <span>{translate('login_title', lang)}</span>
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Secure Passwordless Mobile OTP Login</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Secure Passwordless Mobile OTP & Admin Portal</p>
                   </div>
 
                   <button
@@ -295,54 +333,133 @@ const App: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Login Form */}
-                {!otpSent ? (
-                  <form onSubmit={handleSendOtp} className="space-y-4">
-                    <div>
-                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                        {translate('login_mobile_label', lang)}
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3.5 top-3.5 text-xs text-orange-400 font-extrabold font-mono">+91</span>
-                        <input
-                          type="tel"
-                          maxLength={10}
-                          required
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                          placeholder={translate('login_mobile_placeholder', lang)}
-                          className="w-full bg-slate-950 border border-slate-800 rounded-2xl pl-14 pr-4 py-3.5 text-sm text-white font-mono font-bold focus:border-orange-500 focus:outline-none shadow-inner"
-                        />
+                {/* Tab Selector */}
+                <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800/80">
+                  <button
+                    type="button"
+                    onClick={() => { setLoginTab('phone'); setAuthError(''); }}
+                    className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all ${loginTab === 'phone' ? 'bg-orange-500 text-white' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    📱 Mobile OTP
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setLoginTab('email'); setAuthError(''); }}
+                    className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all ${loginTab === 'email' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    ✉️ Password
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setLoginTab('admin'); setAuthError(''); }}
+                    className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all ${loginTab === 'admin' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    🔐 Admin Portal
+                  </button>
+                </div>
+
+                {/* Tab 1: Phone OTP */}
+                {loginTab === 'phone' && (
+                  !otpSent ? (
+                    <form onSubmit={handleSendOtp} className="space-y-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          {translate('login_mobile_label', lang)}
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3.5 top-3.5 text-xs text-orange-400 font-extrabold font-mono">+91</span>
+                          <input
+                            type="tel"
+                            maxLength={10}
+                            required
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                            placeholder={translate('login_mobile_placeholder', lang)}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-2xl pl-14 pr-4 py-3.5 text-sm text-white font-mono font-bold focus:border-orange-500 focus:outline-none shadow-inner"
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    {authError && <p className="text-rose-400 text-xs font-bold bg-rose-950/60 p-2.5 rounded-xl border border-rose-800">⚠️ {authError}</p>}
+                      {authError && <p className="text-rose-400 text-xs font-bold bg-rose-950/60 p-2.5 rounded-xl border border-rose-800">⚠️ {authError}</p>}
 
-                    <button
-                      type="submit"
-                      disabled={otpLoading}
-                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3.5 rounded-2xl text-xs uppercase tracking-wider transition-all disabled:opacity-60 shadow-lg flex items-center justify-center gap-2"
-                    >
-                      <span>{otpLoading ? 'Sending OTP...' : translate('login_btn_send_otp', lang)}</span>
-                      <ArrowRight size={16} />
-                    </button>
-                  </form>
-                ) : (
-                  <form onSubmit={handleVerifyOtp} className="space-y-4">
+                      <button
+                        type="submit"
+                        disabled={otpLoading}
+                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3.5 rounded-2xl text-xs uppercase tracking-wider transition-all disabled:opacity-60 shadow-lg flex items-center justify-center gap-2"
+                      >
+                        <span>{otpLoading ? 'Sending OTP...' : translate('login_btn_send_otp', lang)}</span>
+                        <ArrowRight size={16} />
+                      </button>
+                    </form>
+                  ) : (
+                    <form onSubmit={handleVerifyOtp} className="space-y-4">
+                      <div>
+                        <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                          {translate('login_otp_label', lang)}
+                        </label>
+                        <input
+                          type="text"
+                          maxLength={4}
+                          required
+                          value={otp}
+                          onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                          placeholder={translate('login_otp_placeholder', lang)}
+                          className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3.5 text-center text-lg font-black font-mono tracking-widest text-orange-400 focus:border-orange-500 focus:outline-none shadow-inner"
+                        />
+                        <p className="text-[11px] text-slate-400 text-center mt-1.5">Enter verification code <strong className="text-orange-400 font-mono">1234</strong> to enter.</p>
+                      </div>
+
+                      {authError && <p className="text-rose-400 text-xs font-bold bg-rose-950/60 p-2.5 rounded-xl border border-rose-800">⚠️ {authError}</p>}
+
+                      <button
+                        type="submit"
+                        disabled={authLoading}
+                        className="w-full bg-orange-600 hover:bg-orange-500 text-white font-extrabold py-3.5 rounded-2xl text-xs uppercase tracking-wider transition-all disabled:opacity-60 shadow-lg"
+                      >
+                        {authLoading ? 'Verifying...' : translate('login_btn_verify_otp', lang)}
+                      </button>
+
+                      <div className="text-center pt-1">
+                        <button
+                          type="button"
+                          onClick={() => { setOtpSent(false); setOtp(''); }}
+                          className="text-[11px] text-slate-400 hover:text-white underline font-bold"
+                        >
+                          {translate('login_change_phone', lang)}
+                        </button>
+                      </div>
+                    </form>
+                  )
+                )}
+
+                {/* Tab 2: Email & Password */}
+                {loginTab === 'email' && (
+                  <form onSubmit={handleLoginSubmit} className="space-y-4">
                     <div>
                       <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
-                        {translate('login_otp_label', lang)}
+                        Email Address
                       </label>
                       <input
-                        type="text"
-                        maxLength={4}
+                        type="email"
                         required
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                        placeholder={translate('login_otp_placeholder', lang)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3.5 text-center text-lg font-black font-mono tracking-widest text-orange-400 focus:border-orange-500 focus:outline-none shadow-inner"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="demo.citizen@jansetu.ai"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3.5 text-sm text-white font-bold focus:border-indigo-500 focus:outline-none"
                       />
-                      <p className="text-[11px] text-slate-400 text-center mt-1.5">Enter verification code <strong className="text-orange-400 font-mono">1234</strong> to enter.</p>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                        Password
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3.5 text-sm text-white font-bold focus:border-indigo-500 focus:outline-none"
+                      />
                     </div>
 
                     {authError && <p className="text-rose-400 text-xs font-bold bg-rose-950/60 p-2.5 rounded-xl border border-rose-800">⚠️ {authError}</p>}
@@ -350,20 +467,65 @@ const App: React.FC = () => {
                     <button
                       type="submit"
                       disabled={authLoading}
-                      className="w-full bg-orange-600 hover:bg-orange-500 text-white font-extrabold py-3.5 rounded-2xl text-xs uppercase tracking-wider transition-all disabled:opacity-60 shadow-lg"
+                      className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-3.5 rounded-2xl text-xs uppercase tracking-wider transition-all disabled:opacity-60 shadow-lg"
                     >
-                      {authLoading ? 'Verifying...' : translate('login_btn_verify_otp', lang)}
+                      {authLoading ? 'Signing In...' : 'Sign In with Password'}
                     </button>
+                  </form>
+                )}
 
-                    <div className="text-center pt-1">
-                      <button
-                        type="button"
-                        onClick={() => { setOtpSent(false); setOtp(''); }}
-                        className="text-[11px] text-slate-400 hover:text-white underline font-bold"
-                      >
-                        {translate('login_change_phone', lang)}
-                      </button>
+                {/* Tab 3: Admin Portal */}
+                {loginTab === 'admin' && (
+                  <form onSubmit={handleAdminLoginSubmit} className="space-y-3">
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+                        Admin Email
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={adminEmail}
+                        onChange={(e) => setAdminEmail(e.target.value)}
+                        placeholder="demo.admin@jansetu.ai"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white font-bold focus:border-emerald-500 focus:outline-none"
+                      />
                     </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+                        Admin Password
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={adminPassword}
+                        onChange={(e) => setAdminPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white font-bold focus:border-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 mb-1">
+                        Security Access Code
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={adminAccessCode}
+                        onChange={(e) => setAdminAccessCode(e.target.value)}
+                        placeholder="ADMIN-2026"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs font-mono font-black text-emerald-400 focus:border-emerald-500 focus:outline-none"
+                      />
+                    </div>
+
+                    {authError && <p className="text-rose-400 text-xs font-bold bg-rose-950/60 p-2 rounded-lg border border-rose-800">⚠️ {authError}</p>}
+
+                    <button
+                      type="submit"
+                      disabled={authLoading}
+                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3 rounded-xl text-xs uppercase tracking-wider transition-all disabled:opacity-60 shadow-lg"
+                    >
+                      {authLoading ? 'Verifying Credentials...' : 'Authenticate Admin Access'}
+                    </button>
                   </form>
                 )}
 
@@ -487,6 +649,15 @@ const App: React.FC = () => {
           <>
             {currentTab === 'dashboard' && (
               <AdminDashboard lang={lang} />
+            )}
+            {currentTab === 'manage-officers' && (
+              <AdminManageOfficers lang={lang} />
+            )}
+            {currentTab === 'manage-grievances' && (
+              <AdminManageGrievances lang={lang} />
+            )}
+            {currentTab === 'system-settings' && (
+              <AdminSystemSettings lang={lang} />
             )}
             {currentTab === 'ai-architecture' && (
               <AIArchitecture />

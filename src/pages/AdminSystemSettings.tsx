@@ -9,7 +9,7 @@ import {
 
 interface AdminSystemSettingsProps {
   lang: Language;
-  onDataReset: () => void;
+  onDataReset?: () => void;
 }
 
 export const AdminSystemSettings: React.FC<AdminSystemSettingsProps> = ({ lang, onDataReset }) => {
