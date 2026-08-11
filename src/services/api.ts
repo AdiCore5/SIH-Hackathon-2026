@@ -1009,5 +1009,16 @@ export const api = {
   async exportGrievances(): Promise<string> {
     const grievances = getLocalStorage<Grievance[]>('js_grievances', []);
     return JSON.stringify(grievances, null, 2);
+  },
+
+  markNotificationAsRead(notificationId: string): boolean {
+    const notifications = getLocalStorage<Notification[]>('js_notifications', []);
+    const idx = notifications.findIndex(n => n.id === notificationId);
+    if (idx !== -1) {
+      notifications[idx].isRead = true;
+      setLocalStorage('js_notifications', notifications);
+      return true;
+    }
+    return false;
   }
 };

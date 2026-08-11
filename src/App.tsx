@@ -16,10 +16,10 @@ import { CitizenDashboard } from './pages/CitizenDashboard';
 import { OfficerDashboard } from './pages/OfficerDashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
 
-import { Key, Landmark, ShieldCheck, UserCheck } from 'lucide-react';
+import { Key, Landmark, ShieldCheck, UserCheck, Volume2, Sparkles, CheckCircle2, Globe, Shield, ArrowRight, Activity, Building2 } from 'lucide-react';
 
 const App: React.FC = () => {
-  // Auth state (Default logged in for immediate demo bypass, login option available)
+  // Auth state (Default false for realistic login screen preview, 1-click bypass available)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState('demo.citizen@jansetu.ai');
   const [password, setPassword] = useState('Demo@123');
@@ -38,7 +38,6 @@ const App: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [userName, setUserName] = useState('Rahul Verma');
 
-  const [loginTab, setLoginTab] = useState<'phone' | 'email'>('phone');
   const [phone, setPhone] = useState('9876543210');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
@@ -74,7 +73,7 @@ const App: React.FC = () => {
     try {
       await api.sendOTP(phone);
       setOtpSent(true);
-      alert('Demo Code Sent! Enter 1234 to verify.');
+      alert('Demo Verification Code Sent! Enter 1234 to verify.');
     } catch (err: any) {
       setAuthError(err.message || "Failed to send OTP.");
     } finally {
@@ -91,10 +90,23 @@ const App: React.FC = () => {
       setIsLoggedIn(true);
       handleRoleChange(response.user.role as UserRole);
     } catch (err: any) {
-      setAuthError(err.message || "Invalid OTP code.");
+      setAuthError(err.message || "Invalid OTP code. Please enter 1234.");
     } finally {
       setAuthLoading(false);
     }
+  };
+
+  const handleDemoLogin = (selectedRole: UserRole) => {
+    setRole(selectedRole);
+    if (selectedRole === 'admin') {
+      setUserName('Dr. Rajesh Nambiar (Nodal Admin)');
+    } else if (selectedRole === 'officer') {
+      setUserName('Officer Amit Sharma (Ward Nodal Chief)');
+    } else {
+      setUserName('Rahul Verma');
+    }
+    setIsLoggedIn(true);
+    setCurrentTab('home');
   };
 
   useEffect(() => {
@@ -137,7 +149,6 @@ const App: React.FC = () => {
   }, [highContrast]);
 
   const fetchNotifications = async () => {
-    // Read from localStorage (api syncs updates to localStorage)
     const stored = localStorage.getItem('js_notifications');
     if (stored) {
       setNotifications(JSON.parse(stored));
@@ -153,124 +164,146 @@ const App: React.FC = () => {
 
   const handleRoleChange = (newRole: UserRole) => {
     setRole(newRole);
-    if (newRole === 'citizen') {
-      setUserName('Rahul Verma');
-      setCurrentTab('home');
+    if (newRole === 'admin') {
+      setUserName('Dr. Rajesh Nambiar (Nodal Admin)');
+      setCurrentTab('dashboard');
     } else if (newRole === 'officer') {
-      setUserName('Amit Sharma');
+      setUserName('Officer Amit Sharma (Ward Nodal Chief)');
       setCurrentTab('dashboard');
     } else {
-      setUserName('Rajesh Kumar');
-      setCurrentTab('dashboard');
+      setUserName('Rahul Verma');
+      setCurrentTab('home');
     }
-    setSelectedGrievanceId('');
   };
 
   const handleNavigate = (tab: string, arg?: string) => {
     setCurrentTab(tab);
-    if (tab === 'track' && arg) {
+    if (arg) {
       setSelectedGrievanceId(arg);
-    } else {
-      setSelectedGrievanceId('');
     }
   };
 
   const handleMarkNotifRead = (id: string) => {
-    const updated = notifications.map(n => n.id === id ? { ...n, isRead: true } : n);
-    setNotifications(updated);
-    localStorage.setItem('js_notifications', JSON.stringify(updated));
+    api.markNotificationAsRead(id);
+    fetchNotifications();
   };
 
-  const handleDemoLogin = async (demoRole: UserRole) => {
-    setAuthLoading(true);
-    setAuthError('');
-    let demoEmail = 'demo.citizen@jansetu.ai';
-    if (demoRole === 'officer') demoEmail = 'demo.officer@jansetu.ai';
-    if (demoRole === 'admin') demoEmail = 'demo.admin@jansetu.ai';
-
-    try {
-      const response = await api.login(demoEmail, 'Demo@123');
-      setIsLoggedIn(true);
-      handleRoleChange(response.user.role as UserRole);
-    } catch (e: any) {
-      setAuthError(e.message || "Authentication error.");
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthLoading(true);
-    setAuthError('');
-    try {
-      const response = await api.login(email, password);
-      setIsLoggedIn(true);
-      handleRoleChange(response.user.role as UserRole);
-    } catch (e: any) {
-      setAuthError(e.message || "Failed to log in.");
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setAuthError('');
-  };
-
-  // 1. SIGN IN SCREEN VIEW
+  // 1. OFFICIAL GOVERNMENT SIGN IN VIEW WITH DIGITAL INDIA BG
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative text-white">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
+      <div 
+        className="min-h-screen relative flex flex-col justify-between text-white font-sans overflow-x-hidden bg-slate-950 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.88), rgba(2, 6, 23, 0.96)), url('/gov_bg.png')` }}
+      >
+        {/* Top Official Tri-Color Border Bar */}
+        <div className="h-1.5 bg-gradient-to-r from-orange-500 via-white to-emerald-600 shadow-md"></div>
 
-        {/* Brand Header */}
-        <div className="sm:mx-auto sm:w-full sm:max-w-md text-center relative z-10 flex flex-col items-center mb-6">
-          <div className="p-3 bg-white/10 rounded-2xl border border-white/20 mb-3 text-orange-400">
-            <Landmark size={32} />
+        {/* Top Bar Header Strip */}
+        <div className="bg-slate-900/90 backdrop-blur-md px-4 md:px-12 py-2 flex flex-wrap justify-between items-center text-[11px] border-b border-slate-800 gap-2">
+          <div className="flex items-center gap-2 font-semibold text-slate-300">
+            <span>🇮🇳</span>
+            <span>भारत सरकार | Government of India</span>
+            <span className="text-slate-600 hidden sm:inline">•</span>
+            <span className="hidden sm:inline text-orange-400 font-bold">Smart India Hackathon (SIH 2026) Flagship</span>
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight">{translate('title', lang)}</h2>
-          <p className="text-xs font-semibold tracking-wider text-orange-400 uppercase mt-1">
-            {translate('tagline', lang)}
-          </p>
+
+          <div className="flex items-center gap-3">
+            <span className="text-emerald-400 font-bold flex items-center gap-1">
+              <Shield size={12} /> GIGW 3.0 & CPGRAMS Aligned
+            </span>
+            <select
+              value={lang}
+              onChange={(e) => setLang(e.target.value as Language)}
+              className="bg-slate-950 border border-slate-800 rounded-lg px-2 py-0.5 text-xs text-white focus:border-orange-500 focus:outline-none font-bold"
+            >
+              <option value="en">English (EN)</option>
+              <option value="hi">हिन्दी (Hindi)</option>
+              <option value="gu">ગુજરાતી (Gujarati)</option>
+            </select>
+          </div>
         </div>
 
-        {/* Side-by-Side Dual Column Portal */}
-        <div className="mt-2 sm:mx-auto sm:w-full sm:max-w-4xl relative z-10">
-          <div className="bg-slate-900 border border-slate-800 shadow-premium rounded-3xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+        {/* Main Portal Container */}
+        <div className="flex-1 flex items-center justify-center p-4 md:p-8 relative z-10">
+          <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
-            {/* Left Column: Interactive Form */}
-            <div className="p-6 md:p-10 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-800">
-              
-              {/* Language switcher dropdown inside login form */}
-              <div className="flex justify-end gap-1.5 mb-6 text-[11px] font-bold text-slate-500 items-center">
-                <span>🌐 Language / भाषा:</span>
-                <select
-                  value={lang}
-                  onChange={(e) => setLang(e.target.value as Language)}
-                  className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-white focus:border-orange-500 focus:outline-none cursor-pointer font-sans"
-                >
-                  <option value="en">English (EN)</option>
-                  <option value="hi">हिन्दी (Hindi)</option>
-                  <option value="gu">ગુજરાતી (Gujarati)</option>
-                </select>
+            {/* Left Hero & Platform Pitch Column */}
+            <div className="lg:col-span-6 space-y-6 text-left animate-slide-up">
+              <div className="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs px-3.5 py-1.5 rounded-full font-bold uppercase tracking-wider">
+                <Sparkles size={14} className="text-orange-400 animate-spin" style={{ animationDuration: '6s' }} />
+                <span>Next-Gen Smart Public Grievances</span>
               </div>
 
-              {/* Mobile + OTP Flow */}
-              <div className="space-y-4">
-                <h4 className="font-extrabold text-sm text-slate-200">{translate('login_title', lang)}</h4>
+              <div className="space-y-2">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight font-sans">
+                  JanSetu <span className="text-orange-500 bg-orange-950/60 border border-orange-800/60 px-2 py-0.5 rounded-xl">AI</span>
+                </h1>
+                <p className="text-lg md:text-xl text-orange-400 font-extrabold tracking-wide">
+                  “{translate('tagline', lang)}”
+                </p>
+              </div>
+
+              <p className="text-slate-300 text-xs md:text-sm leading-relaxed max-w-xl">
+                National AI-powered civic portal enabling 1.4B citizens to log public issues via voice in Indian regional languages, with automated department routing and time-bound SLA enforcement.
+              </p>
+
+              {/* Digital India Vision Badges */}
+              <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
+                <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-2xl flex items-center gap-2.5 backdrop-blur-sm">
+                  <div className="p-2 bg-orange-500/20 text-orange-400 rounded-xl">
+                    <Activity size={18} />
+                  </div>
+                  <div>
+                    <h5 className="font-extrabold text-white text-xs">72% Faster Redressal</h5>
+                    <p className="text-[10px] text-slate-400">Automated SLA Routing</p>
+                  </div>
+                </div>
+
+                <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-2xl flex items-center gap-2.5 backdrop-blur-sm">
+                  <div className="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl">
+                    <Building2 size={18} />
+                  </div>
+                  <div>
+                    <h5 className="font-extrabold text-white text-xs">18+ Municipalities</h5>
+                    <p className="text-[10px] text-slate-400">Central & State Sync</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Form Card Column */}
+            <div className="lg:col-span-6 animate-slide-up">
+              <div className="bg-slate-900/90 border border-slate-800/90 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl space-y-6">
                 
+                {/* Header */}
+                <div className="flex justify-between items-center border-b border-slate-800/80 pb-4">
+                  <div>
+                    <h3 className="text-lg font-extrabold text-white flex items-center gap-2">
+                      <Landmark className="text-orange-500" size={20} />
+                      <span>{translate('login_title', lang)}</span>
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">Secure Passwordless Mobile OTP Login</p>
+                  </div>
+
+                  <button
+                    onClick={playVoiceGuide}
+                    className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-orange-400 px-3 py-1.5 rounded-full text-[10px] font-extrabold transition-all active:scale-95"
+                    title="Audio Assistance"
+                  >
+                    <Volume2 size={13} className="animate-pulse" />
+                    <span>{translate('login_btn_read_guide', lang)}</span>
+                  </button>
+                </div>
+
+                {/* Login Form */}
                 {!otpSent ? (
-                  /* Step 1: Input Mobile */
                   <form onSubmit={handleSendOtp} className="space-y-4">
                     <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
                         {translate('login_mobile_label', lang)}
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-3 text-xs text-slate-500 font-bold font-mono">+91</span>
+                        <span className="absolute left-3.5 top-3.5 text-xs text-orange-400 font-extrabold font-mono">+91</span>
                         <input
                           type="tel"
                           maxLength={10}
@@ -278,26 +311,26 @@ const App: React.FC = () => {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                           placeholder={translate('login_mobile_placeholder', lang)}
-                          className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-12 pr-4 py-3 text-sm text-white font-mono focus:border-orange-500 focus:outline-none"
+                          className="w-full bg-slate-950 border border-slate-800 rounded-2xl pl-14 pr-4 py-3.5 text-sm text-white font-mono font-bold focus:border-orange-500 focus:outline-none shadow-inner"
                         />
                       </div>
                     </div>
 
-                    {authError && <p className="text-rose-500 text-xs font-semibold">⚠️ {authError}</p>}
+                    {authError && <p className="text-rose-400 text-xs font-bold bg-rose-950/60 p-2.5 rounded-xl border border-rose-800">⚠️ {authError}</p>}
 
                     <button
                       type="submit"
                       disabled={otpLoading}
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all disabled:opacity-60 flex justify-center items-center gap-1.5"
+                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3.5 rounded-2xl text-xs uppercase tracking-wider transition-all disabled:opacity-60 shadow-lg flex items-center justify-center gap-2"
                     >
-                      {otpLoading ? 'Sending...' : translate('login_btn_send_otp', lang)}
+                      <span>{otpLoading ? 'Sending OTP...' : translate('login_btn_send_otp', lang)}</span>
+                      <ArrowRight size={16} />
                     </button>
                   </form>
                 ) : (
-                  /* Step 2: Input OTP */
                   <form onSubmit={handleVerifyOtp} className="space-y-4">
                     <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
                         {translate('login_otp_label', lang)}
                       </label>
                       <input
@@ -307,112 +340,76 @@ const App: React.FC = () => {
                         value={otp}
                         onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                         placeholder={translate('login_otp_placeholder', lang)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-center font-bold font-mono tracking-widest text-white focus:border-orange-500 focus:outline-none"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3.5 text-center text-lg font-black font-mono tracking-widest text-orange-400 focus:border-orange-500 focus:outline-none shadow-inner"
                       />
-                      <p className="text-[10px] text-slate-500 mt-1">SMS sent to +91 {phone}. Enter **1234** for verification.</p>
+                      <p className="text-[11px] text-slate-400 text-center mt-1.5">Enter verification code <strong className="text-orange-400 font-mono">1234</strong> to enter.</p>
                     </div>
 
-                    {authError && <p className="text-rose-500 text-xs font-semibold">⚠️ {authError}</p>}
+                    {authError && <p className="text-rose-400 text-xs font-bold bg-rose-950/60 p-2.5 rounded-xl border border-rose-800">⚠️ {authError}</p>}
 
                     <button
                       type="submit"
                       disabled={authLoading}
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all disabled:opacity-60"
+                      className="w-full bg-orange-600 hover:bg-orange-500 text-white font-extrabold py-3.5 rounded-2xl text-xs uppercase tracking-wider transition-all disabled:opacity-60 shadow-lg"
                     >
                       {authLoading ? 'Verifying...' : translate('login_btn_verify_otp', lang)}
                     </button>
 
-                    <div className="text-center pt-2">
+                    <div className="text-center pt-1">
                       <button
                         type="button"
                         onClick={() => { setOtpSent(false); setOtp(''); }}
-                        className="text-[10px] text-slate-400 hover:text-white underline font-bold"
+                        className="text-[11px] text-slate-400 hover:text-white underline font-bold"
                       >
                         {translate('login_change_phone', lang)}
                       </button>
                     </div>
                   </form>
                 )}
-              </div>
-            </div>
 
-            {/* Right Column: Step-by-Step Instructions & Helpers */}
-            <div className="p-6 md:p-10 bg-slate-950 flex flex-col justify-between gap-6">
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="font-extrabold text-sm text-slate-200">{translate('login_how_to_title', lang)}</h4>
-                  
-                  {/* Voice help speaker */}
-                  <button
-                    onClick={playVoiceGuide}
-                    className="flex items-center gap-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 px-2.5 py-1 rounded-full text-[9px] font-black text-orange-400 active:scale-95 transition-all"
-                    title="Play voice guide instructions"
-                  >
-                    {translate('login_btn_read_guide', lang)}
-                  </button>
-                </div>
-
-                <div className="space-y-4 text-[11px] leading-relaxed text-slate-400">
-                  <div className="flex gap-2.5">
-                    <span className="h-5 w-5 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center font-bold text-[10px] shrink-0">1</span>
-                    <div>
-                      <p className="font-bold text-slate-200">{translate('login_step_1_title', lang)}</p>
-                      <p className="mt-0.5">{translate('login_step_1_desc', lang)}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2.5">
-                    <span className="h-5 w-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0">2</span>
-                    <div>
-                      <p className="font-bold text-slate-200">{translate('login_step_2_title', lang)}</p>
-                      <p className="mt-0.5">{translate('login_step_2_desc', lang)}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2.5">
-                    <span className="h-5 w-5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center font-bold text-[10px] shrink-0">3</span>
-                    <div>
-                      <p className="font-bold text-slate-200">{translate('login_step_3_title', lang)}</p>
-                      <p className="mt-0.5">{translate('login_step_3_desc', lang)}</p>
-                    </div>
+                {/* Direct 1-Click Evaluation Bypass */}
+                <div className="border-t border-slate-800/80 pt-4 space-y-2">
+                  <span className="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider block text-center">
+                    ⚡ Hackathon Demo — 1-Click Role Direct Preview:
+                  </span>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDemoLogin('citizen')}
+                      className="bg-slate-950 border border-slate-800 hover:border-orange-500 py-2.5 rounded-xl text-[10px] font-extrabold text-slate-300 hover:text-white flex flex-col items-center gap-1 transition-all shadow-sm"
+                    >
+                      <UserCheck size={14} className="text-orange-400" />
+                      <span>Citizen</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDemoLogin('officer')}
+                      className="bg-slate-950 border border-slate-800 hover:border-indigo-500 py-2.5 rounded-xl text-[10px] font-extrabold text-slate-300 hover:text-white flex flex-col items-center gap-1 transition-all shadow-sm"
+                    >
+                      <ShieldCheck size={14} className="text-indigo-400" />
+                      <span>Officer</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDemoLogin('admin')}
+                      className="bg-slate-950 border border-slate-800 hover:border-emerald-500 py-2.5 rounded-xl text-[10px] font-extrabold text-slate-300 hover:text-white flex flex-col items-center gap-1 transition-all shadow-sm"
+                    >
+                      <Key size={14} className="text-emerald-400" />
+                      <span>Admin</span>
+                    </button>
                   </div>
                 </div>
-              </div>
 
-              {/* 1-Click bypass testing */}
-              <div className="border-t border-slate-900 pt-5">
-                <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider block mb-2 text-center lg:text-left">
-                  {translate('login_demo_title', lang)}
-                </span>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleDemoLogin('citizen')}
-                    className="bg-slate-900 border border-slate-800 hover:border-orange-500 py-2 rounded-xl text-[9px] font-bold text-slate-300 hover:text-white flex flex-col items-center gap-1 transition-all"
-                  >
-                    <UserCheck size={12} className="text-orange-400" />
-                    Citizen
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDemoLogin('officer')}
-                    className="bg-slate-900 border border-slate-800 hover:border-indigo-500 py-2 rounded-xl text-[9px] font-bold text-slate-300 hover:text-white flex flex-col items-center gap-1 transition-all"
-                  >
-                    <ShieldCheck size={12} className="text-indigo-400" />
-                    Officer
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDemoLogin('admin')}
-                    className="bg-slate-900 border border-slate-800 hover:border-emerald-500 py-2 rounded-xl text-[9px] font-bold text-slate-300 hover:text-white flex flex-col items-center gap-1 transition-all"
-                  >
-                    <Key size={12} className="text-emerald-400" />
-                    Admin
-                  </button>
-                </div>
               </div>
-
             </div>
 
           </div>
+        </div>
+
+        {/* Footer info strip */}
+        <div className="bg-slate-950/90 text-slate-500 py-3 px-4 text-center text-[10px] border-t border-slate-900 flex justify-between items-center px-4 md:px-12">
+          <span>Managed by National Informatics Centre (NIC) & MeitY, Government of India</span>
+          <span>SIH Hackathon 2026 Prototype • GIGW Version 3.0</span>
         </div>
       </div>
     );
