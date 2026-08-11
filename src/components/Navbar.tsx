@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { translate, Language } from '../services/i18n';
 import { UserRole, Notification } from '../types';
-import { Bell, Globe, Menu, X, Landmark, Shield, User as UserIcon, Volume2, Sparkles, CheckCircle2, ChevronDown, Award } from 'lucide-react';
+import { Bell, Globe, Menu, X, Landmark, Shield, User as UserIcon, Volume2, Sparkles, CheckCircle2, ChevronDown, Award, LogOut } from 'lucide-react';
 
 interface NavbarProps {
   currentTab: string;
